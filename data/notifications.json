@@ -1,0 +1,106 @@
+[
+  {
+    "date": "2026-08-15",
+    "plan": "Yemen airspace closure",
+    "risk": "Red",
+    "priority": "Critical",
+    "contacts": "Sarah Mitchell, James Park, Elena Torres, Omar Farouk",
+    "status": "Sent"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "Iran FIR military exercise",
+    "risk": "Amber",
+    "priority": "High",
+    "contacts": "Sarah Mitchell, James Park, Omar Farouk",
+    "status": "Sent"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "MEL restriction A6-EDO",
+    "risk": "Amber",
+    "priority": "High",
+    "contacts": "Raj Singh, James Park, Elena Torres, Aftab Khan",
+    "status": "Acknowledged"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "A6-EER C-check gap",
+    "risk": "Amber",
+    "priority": "High",
+    "contacts": "Aftab Khan, James Park",
+    "status": "Pending"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "Dense fog forecast SHJ",
+    "risk": "Amber",
+    "priority": "High",
+    "contacts": "Sarah Mitchell, James Park, Elena Torres",
+    "status": "Pending"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "Sandstorm warning DXB/SHJ",
+    "risk": "Amber",
+    "priority": "Medium",
+    "contacts": "Sarah Mitchell, James Park",
+    "status": "Pending"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "KRT fuel unavailability",
+    "risk": "Amber",
+    "priority": "High",
+    "contacts": "Omar Farouk, James Park",
+    "status": "Pending"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "Crew FTL 900hr limit",
+    "risk": "Amber",
+    "priority": "Medium",
+    "contacts": "Aftab Khan, James Park",
+    "status": "Pending"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "Sudan FIR permit expiry",
+    "risk": "Red",
+    "priority": "Critical",
+    "contacts": "Sarah Mitchell, James Park, Elena Torres, Omar Farouk",
+    "status": "Escalated"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "MCT runway maintenance",
+    "risk": "Amber",
+    "priority": "Medium",
+    "contacts": "James Park, Omar Farouk",
+    "status": "Acknowledged"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "BKK security advisory",
+    "risk": "Amber",
+    "priority": "Medium",
+    "contacts": "Aftab Khan, James Park",
+    "status": "Pending"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "VVIP movement SHJ",
+    "risk": "Amber",
+    "priority": "High",
+    "contacts": "Sarah Mitchell, James Park, Elena Torres",
+    "status": "Actioned"
+  },
+  {
+    "date": "2026-08-15",
+    "plan": "Hajj extra sections",
+    "risk": "Amber",
+    "priority": "High",
+    "contacts": "Aftab Khan, James Park, Omar Farouk",
+    "status": "Pending"
+  }
+]

@@ -1,0 +1,1037 @@
+[
+  {
+    "id": "p1",
+    "title": "Yemen airspace closure — rerouting required for 3 sectors",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "airspace_closure",
+      "fuel_availability",
+      "crew_constraints"
+    ],
+    "routes_affected": [
+      "G9401 SHJ-MCT",
+      "G9402 MCT-SHJ",
+      "G9380 SHJ-CMB"
+    ],
+    "priority": "Critical",
+    "risk_level": "Red",
+    "status": "Active",
+    "trigger": "NOTAM",
+    "description": "NOTAM A1234 issued for partial airspace closure over Yemen corridor Aug 18-19. Rerouting required for G9401/G9402 SHJ-MCT and G9380 SHJ-CMB via OMAN FIR. Additional fuel burn 800kg/sector, +25min flight time. Crew FTL implications on long-haul connections.",
+    "caseStage": "Resolved",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via NOTAM. Cross-checked against network exposure — flagged Red."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      },
+      {
+        "t": "D-1, 13:00Z",
+        "a": "Agent",
+        "x": "Confirmed action taken. Marking resolved — will re-open automatically if conditions change."
+      }
+    ]
+  },
+  {
+    "id": "p2",
+    "title": "Iran FIR military exercise — transit restrictions Aug 18-19",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "airspace_closure",
+      "airport_slots"
+    ],
+    "routes_affected": [
+      "G9331 SHJ-IST",
+      "G9220 SHJ-THR"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "NOTAM",
+    "description": "Military exercise in Tehran FIR restricting FL340-FL410. Transit flights to IST and THR may need lower FLs or rerouting via Turkey. Expect 15-20min delay on affected sectors.",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via NOTAM. Cross-checked against network exposure — flagged Amber."
+      }
+    ]
+  },
+  {
+    "id": "p3",
+    "title": "MEL restriction A6-EDO — CAT II/III ops limited for KRT & CAI",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "mel_restriction",
+      "crew_constraints"
+    ],
+    "routes_affected": [
+      "G9123 SHJ-KRT",
+      "G9456 SHJ-CAI"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Maintenance",
+    "description": "A6-EDO MEL item 32-12 (Nose Wheel Steering) restricts CAT II/III operations. Aircraft planned on G9123 SHJ-KRT and G9456 SHJ-CAI on Aug 17. Destinations require CAT II capability due to fog season. Coordinate with maintenance for rectification or swap to A6-EER.",
+    "caseStage": "InProgress",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      }
+    ]
+  },
+  {
+    "id": "p4",
+    "title": "A6-EER scheduled for C-check — fleet utilization gap Aug 17-19",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "crew_constraints"
+    ],
+    "routes_affected": [
+      "All A320 rotations"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Maintenance",
+    "description": "A6-EER enters scheduled C-check Aug 17 for 3 days. Fleet reduced to 31 aircraft. Peak wave coverage tight at 14:00-18:00Z. Crew rostering needs to account for reduced availability. Consider re-timing one rotation or wet-lease coverage.",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Amber."
+      }
+    ]
+  },
+  {
+    "id": "p5",
+    "title": "Dense fog forecast SHJ — CAT I only operations Aug 18 morning",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "weather",
+      "airport_slots",
+      "crew_constraints"
+    ],
+    "routes_affected": [
+      "G9101 SHJ-CAI",
+      "G9103 SHJ-BAH",
+      "G9107 SHJ-MCT",
+      "G9109 SHJ-KHI"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Weather",
+    "description": "METAR trend indicates radiation fog at SHJ 02:00-06:00Z Aug 18. RVR expected 300-500m, CAT I only. 4 departures in window may face weather delays of 30-90min. Coordinate with ATC for slot management and ensure MEL-free CAT II/III aircraft on stand.",
+    "caseStage": "Acknowledged",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Weather. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p6",
+    "title": "Sandstorm warning — DXB/SHJ visibility <1500m Aug 19",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "weather",
+      "fuel_availability"
+    ],
+    "routes_affected": [
+      "All SHJ departures",
+      "SHJ arrivals bank"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Weather",
+    "description": "ACC forecast warns of rising sand Aug 19 afternoon, visibility dropping to 1500m. SHJ arrivals may require holding fuel or diversions to AUH/MCT. Load extra contingency fuel on 6 affected sectors. Brief crew on low-vis taxi procedures.",
+    "caseStage": "InProgress",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Weather. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      }
+    ]
+  },
+  {
+    "id": "p7",
+    "title": "Tankering required — KRT fuel unavailability for G9123 Aug 19",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "fuel_availability",
+      "tankering"
+    ],
+    "routes_affected": [
+      "G9123 SHJ-KRT"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Fuel Supplier",
+    "description": "KRT fuel supplier confirms unavailability Aug 19 due to refinery maintenance. Tankering required from SHJ on G9123. Extra fuel uplift increases MTOW — payload restriction ~1.2T on SHJ-KRT sector. Coordinate with dispatch and load control.",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Fuel Supplier. Cross-checked against network exposure — flagged Amber."
+      }
+    ]
+  },
+  {
+    "id": "p8",
+    "title": "Crew FTL risk — 3 pilots approaching 900-hour annual limit",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "crew_constraints"
+    ],
+    "routes_affected": [
+      "G9401 SHJ-MCT",
+      "G9220 SHJ-THR",
+      "G9331 SHJ-IST"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Crew System",
+    "description": "3 Captains (Capt. Rahman, Capt. Yusuf, Capt. Ali) approaching 900-hour annual FTL limit by Aug 31. Roster planning needs to distribute their remaining hours. If not managed, 3 sectors may need crew swaps starting Aug 18. Crew scheduling to issue revised roster by Aug 16.",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Crew System. Cross-checked against network exposure — flagged Amber."
+      }
+    ]
+  },
+  {
+    "id": "p9",
+    "title": "Overflight permit expiry — Sudan FIR Aug 19",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "airspace_closure"
+    ],
+    "routes_affected": [
+      "G9123 SHJ-KRT",
+      "G9501 SHJ-NBO",
+      "G9307 SHJ-JNB"
+    ],
+    "priority": "Critical",
+    "risk_level": "Red",
+    "status": "Active",
+    "trigger": "Permit Expiry",
+    "description": "Sudan FIR overflight permit expires Aug 19. Renewal submitted Aug 13 but confirmation pending from Khartoum ATC. 3 sectors transit Sudan FIR daily. If permit lapses, rerouting via Egypt FIR adds 45min + 1200kg fuel per sector. Escalate to External Affairs if no confirmation by Aug 18.",
+    "caseStage": "Acknowledged",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Permit Expiry. Cross-checked against network exposure — flagged Red."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p10",
+    "title": "MCT slot constraints — runway maintenance 02:00-05:00Z Aug 17",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "airport_slots",
+      "watch_hours"
+    ],
+    "routes_affected": [
+      "G9110 MCT-SHJ",
+      "G9111 SHJ-MCT",
+      "G9205 MCT-BKK",
+      "G9302 MCT-DEL"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "ATC",
+    "description": "OACC advises MCT runway maintenance 02:00-05:00Z Aug 17. No departures/arrivals during window. 4 sectors scheduled in window — 2 need retiming by ±60min. Coordinate slot changes with MCT airport coordination by Aug 16 EOD.",
+    "caseStage": "InProgress",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      }
+    ]
+  },
+  {
+    "id": "p11",
+    "title": "Security advisory — BKK political gathering Aug 19",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "crew_constraints",
+      "airport_slots"
+    ],
+    "routes_affected": [
+      "G9205 MCT-BKK",
+      "G9206 BKK-MCT"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Security",
+    "description": "Embassy advisory for large political gathering near Bangkok Suvarnabhumi Aug 19. Road access to BKK airport may be disrupted. Crew layover logistics need review — ensure hotel transport backup plan. Crew scheduling to confirm crew willingness and arrange alternate transport. No flight cancellation anticipated but ground delays possible.",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Security. Cross-checked against network exposure — flagged Amber."
+      }
+    ]
+  },
+  {
+    "id": "p12",
+    "title": "VVIP movement SHJ — GA Runway closure 10:00-11:30Z Aug 18",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "runway_closure",
+      "airport_slots"
+    ],
+    "routes_affected": [
+      "G9107 SHJ-MCT",
+      "G9109 SHJ-KHI",
+      "G9111 SHJ-MCT"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "ATC",
+    "description": "VVIP movement requires GA Runway closure 10:00-11:30Z Aug 18. 3 departures in window need re-slotting to RWY 31 or timing adjustment. Coordinate with SHJ ATC for departure sequence. Fuel planning for potential ground holding.",
+    "caseStage": "Acknowledged",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p13",
+    "title": "Hajj extra sections — 4 additional flights Aug 18-19",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "crew_constraints",
+      "airport_slots",
+      "fuel_availability"
+    ],
+    "routes_affected": [
+      "G9H01 SHJ-JED",
+      "G9H02 JED-SHJ",
+      "G9H03 SHJ-JED",
+      "G9H04 JED-SHJ"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Schedule",
+    "description": "4 Hajj extra sections scheduled Aug 18-19 SHJ-JED roundtrips. Requires 4 dedicated aircraft + 8 crews (4 pilots + 4 cabin crews). Impact on regular schedule: 2 aircraft pulled from MCT/CAI rotations for Hajj coverage. Slot coordination with JED required — tight parking at Hajj terminal. Fuel pre-order at JED.",
+    "caseStage": "Acknowledged",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Schedule. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p14",
+    "title": "Chennai ETOPS alternate runway closure — reduced diversion coverage on Bay of Bengal sectors",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "etops_alternate",
+      "fuel_availability"
+    ],
+    "routes_affected": [
+      "G9802 SHJ-KUL (A6-ATA)",
+      "G9714 SHJ-HKT (A6-ATF)",
+      "G9520 SHJ-CGP (A6-AQQ)"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "NOTAM",
+    "description": "NOTAM confirms VOMM (Chennai) RWY 07/25 closed for resurfacing 18-20 Aug, removing the primary ETOPS-120 enroute alternate for the SHJ-KUL, SHJ-HKT and SHJ-CGP overwater legs flown on A320/321-family aircraft. Re-plan diversion coverage via Bengaluru/Colombo; verify revised ETOPS entry/exit points and re-file computerized flight plans. Confirm crew briefing includes revised alternate minima and fuel reserve.",
+    "source": "Schedule-Derived",
+    "caseStage": "Acknowledged",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via NOTAM. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p15",
+    "title": "FDP extension risk — G9821 SHJ-BKK late departure impacts return crew duty",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "fdp_extension",
+      "crew_constraints"
+    ],
+    "routes_affected": [
+      "G9821 SHJ-BKK (A6-ARL)",
+      "G9822 BKK-SHJ (A6-ARH)"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Crew System",
+    "description": "G9821 SHJ-BKK (STD 18:15Z) forecast to depart 90min late on ATFM ground delay at BKK. Rostered commander's FDP on the outbound sector projects to exceed the un-extended limit by report time for the following day's early BKK-SHJ return. Crew scheduling to pre-clear commander's discretion criteria or arrange standby crew at BKK before departure to avoid disruption to G9822.",
+    "source": "Schedule-Derived",
+    "caseStage": "Acknowledged",
+    "patternNote": "This is the 3rd time in 5 days this exact rotation (SHJ-BKK-SHJ) has triggered an FDP-risk alert. A single delay is normal; a repeat pattern usually means the rotation itself is scheduled too tight for realistic BKK turnarounds — worth a roster review, not just another one-off fix.",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Crew System. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p16",
+    "title": "GPS jamming advisory — Baghdad/Erbil/Aleppo FIR RNAV approaches degraded",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "gps_interference",
+      "airspace_closure"
+    ],
+    "routes_affected": [
+      "G9368 SHJ-BGW (A6-ANR)",
+      "G9357 SHJ-EBL (A6-ARB)",
+      "G9351 SHJ-ALP (A6-AOH)"
+    ],
+    "priority": "Critical",
+    "risk_level": "Red",
+    "status": "Active",
+    "trigger": "ATC",
+    "description": "Multiple GNSS-interference reports filed in Baghdad and Damascus FIR over the last 48h consistent with regional jamming/spoofing. RNAV(GNSS) approaches at BGW, EBL and ALP may be unreliable — crews to plan conventional (ILS/VOR) approach backup and brief on INS/IRS cross-check procedures. Dispatch to review RAIM prediction and file conventional alternates with full non-RNAV approach capability.",
+    "source": "Manual",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via ATC. Cross-checked against network exposure — flagged Red."
+      }
+    ]
+  },
+  {
+    "id": "p17",
+    "title": "Extreme heat performance penalty — JED/RUH/MED afternoon departures Aug 17-19",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "performance_penalty",
+      "fuel_availability"
+    ],
+    "routes_affected": [
+      "G9155 RUH-SHJ (A6-AQF)",
+      "G9148 JED-SHJ (A6-ATH)",
+      "G9176 MED-SHJ (A6-AQN)",
+      "G9149 SHJ-JED (A6-AQH)"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Weather",
+    "description": "ACC forecast +47°C surface temps at JED/RUH/MED 11:00-15:00Z window Aug 17-19. Afternoon departures on these routes face V1/VR performance-limited TOW; expect payload restriction 300-900kg or retiming to cooler windows where slots allow. Load control to run temperature-corrected performance for each affected sector and flag any cargo/pax offload requirement 3h before STD.",
+    "source": "Schedule-Derived",
+    "caseStage": "InProgress",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Weather. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      }
+    ]
+  },
+  {
+    "id": "p18",
+    "title": "France ATC industrial action — CDG/LYS/BOD/MPL rotations at risk Aug 19",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "industrial_action",
+      "airport_slots"
+    ],
+    "routes_affected": [
+      "3O827 RBA-CDG",
+      "3O341 CMN-LYS",
+      "3O303 TNG-BOD",
+      "3O337 FEZ-MPL"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "ATC",
+    "description": "French DGAC/unions have called a one-day ATC strike Aug 19 with minimum-service requirements at CDG, LYS, BOD and MPL. Expect 20-40% flight programme reduction directive and mandatory pre-notification (\"pre-notif\") filing by carriers 48h prior. Commercial to confirm which of the 4 daily France rotations must be cancelled or consolidated; notify affected passengers per EU261 obligations and hold aircraft/crew for re-planned rotations.",
+    "source": "Manual",
+    "caseStage": "InProgress",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      }
+    ]
+  },
+  {
+    "id": "p19",
+    "title": "Flight planning system degraded — manual dispatch contingency network-wide",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "cyber_system",
+      "crew_constraints"
+    ],
+    "routes_affected": [
+      "All network — dispatch/flight planning function"
+    ],
+    "priority": "Critical",
+    "risk_level": "Red",
+    "status": "Active",
+    "trigger": "Manual",
+    "description": "Primary flight-planning/EFB data provider reporting intermittent outage affecting NOTAM feed, weight & balance and computerized flight plan generation. Activate manual dispatch contingency procedure — paper W&B, backup NOTAM briefing pack, and voice coordination with OCC for all departures until system confirmed stable. Prioritize Critical/Red sectors (ETOPS, hot & high, permit-constrained) for manual verification first.",
+    "source": "Manual",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Manual. Cross-checked against network exposure — flagged Red."
+      }
+    ]
+  },
+  {
+    "id": "p20",
+    "title": "ETOPS currency check due — A6-ATF and A6-ATA approaching recheck window",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "etops_alternate",
+      "mel_restriction"
+    ],
+    "routes_affected": [
+      "G9714 SHJ-HKT (A6-ATF)",
+      "G9802 SHJ-KUL (A6-ATA)"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Maintenance",
+    "description": "Fleet tracking flags A6-ATF and A6-ATA ETOPS airworthiness recheck (APU/fuel system reliability package) due within 72h. Both tails are rostered on overwater ETOPS-120 sectors to HKT and KUL Aug 19. Maintenance to confirm recheck completion or swap to a current-certified tail before dispatch; do not release on ETOPS sector pending confirmation.",
+    "source": "Schedule-Derived",
+    "caseStage": "Acknowledged",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p21",
+    "title": "Layover hotel disruption — BKK/KUL crew rest facility overbooked Aug 18",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "crew_constraints",
+      "fdp_extension"
+    ],
+    "routes_affected": [
+      "G9822 BKK-SHJ (A6-ARH)",
+      "G9803 KUL-SHJ (A6-ATA)"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Crew System",
+    "description": "Contracted layover hotel at BKK reports an overbooking event affecting confirmed crew rooms for the night of Aug 17/18, risking non-compliant rest before the early Aug 18 return sectors. Crew services to confirm alternate WOCL-compliant accommodation immediately or trigger standby crew cover; do not accept reduced-rest crew for dispatch without a compliant rest declaration.",
+    "source": "Schedule-Derived",
+    "caseStage": "Resolved",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Crew System. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      },
+      {
+        "t": "D-1, 13:00Z",
+        "a": "Agent",
+        "x": "Confirmed action taken. Marking resolved — will re-open automatically if conditions change."
+      }
+    ]
+  },
+  {
+    "id": "p22",
+    "title": "Bird activity NOTAM — SHJ increased strike risk during evening departure bank",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "airport_slots",
+      "weather"
+    ],
+    "routes_affected": [
+      "G9027 SHJ-DOH",
+      "G9149 SHJ-JED",
+      "G91941 SHJ-AMM"
+    ],
+    "priority": "Low",
+    "risk_level": "Green",
+    "status": "Active",
+    "trigger": "NOTAM",
+    "description": "SHJ Airport NOTAM reports elevated bird activity near the RWY 12 threshold during the 17:00-20:00Z evening departure bank, linked to seasonal migration. No operational restriction issued; crews to brief on bird-strike avoidance procedure and report any strike immediately for post-flight inspection. Ground ops running additional wildlife dispersal patrols.",
+    "source": "Schedule-Derived",
+    "caseStage": "Resolved",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via NOTAM. Cross-checked against network exposure — flagged Green."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      },
+      {
+        "t": "D-1, 13:00Z",
+        "a": "Agent",
+        "x": "Confirmed action taken. Marking resolved — will re-open automatically if conditions change."
+      }
+    ]
+  },
+  {
+    "id": "p23",
+    "title": "Diplomatic overflight clearance pending — Jordan/Lebanon sectors Aug 19",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "airspace_closure"
+    ],
+    "routes_affected": [
+      "G91941 SHJ-AMM",
+      "G9330 SHJ-AMM",
+      "3L452 AUH-BEY"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Permit Expiry",
+    "description": "Annual diplomatic overflight clearance renewal for Jordanian and Lebanese airspace is pending confirmation ahead of Aug 19 expiry of the current approval. External Affairs submitted renewal Aug 13; no written confirmation received. If unconfirmed by Aug 18 EOD, affected sectors must file reroute via alternate FIR with revised fuel/time — escalate to avoid last-minute flight planning changes.",
+    "source": "Manual",
+    "caseStage": "Acknowledged",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Permit Expiry. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p24",
+    "title": "Fleet-wide engine AD inspection — 4 A320neo-family tails grounded through Aug 20",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "fleet",
+      "mel_restriction"
+    ],
+    "routes_affected": [
+      "A6-AQU (SHJ-KHI/SHJ-DOH rotations)",
+      "A6-ARI (SHJ-MUX rotation)",
+      "A6-AQN (SHJ-DMM/SHJ-RUH rotations)",
+      "A6-ATG (SHJ-DAC/SHJ-JED rotations)"
+    ],
+    "priority": "Critical",
+    "risk_level": "Red",
+    "status": "Active",
+    "trigger": "Maintenance",
+    "description": "OEM airworthiness directive requires immediate borescope inspection of 4 A320neo-family tails following a powder-metal contamination alert on the installed engine variant (same defect class that has grounded up to a quarter of comparable A320neo operators' fleets, e.g. Wizz Air's ~240-aircraft fleet, since 2023). Inspection slot takes 3-5 days per tail at SHJ; no swap capacity for all 4 simultaneously. Fleet planning to sequence inspections and identify wet-lease/charter cover for the highest-priority rotations first.",
+    "source": "Schedule-Derived",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Red."
+      }
+    ]
+  },
+  {
+    "id": "p25",
+    "title": "Reroute congestion via Oman/Arabian Sea corridor — Pakistan-bound sectors Aug 18-19",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "congestion",
+      "airspace_closure",
+      "fuel_availability"
+    ],
+    "routes_affected": [
+      "9P515 DXB-LHE",
+      "9P740 ISB-SHJ",
+      "9P700 ISB-JED",
+      "9P670 KHI-ISB",
+      "9P580 LHE-RUH"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "ATC",
+    "description": "Elevated India-Pakistan bilateral airspace tension (precedent: the reciprocal closures of May 2025, which pushed hundreds of daily flights onto Oman/UAE/Arabian Sea corridors for weeks) has ATC flow-managing traffic onto the same alternate corridors used by our SHJ-Pakistan network. Expect ATFM slot delays 20-45min and higher enroute holding fuel burn on DXB-LHE, ISB-SHJ, ISB-JED, KHI-ISB and LHE-RUH sectors. Dispatch to add contingency fuel and monitor for further FIR restriction NOTAMs.",
+    "source": "Extrapolated",
+    "caseStage": "Acknowledged",
+    "predictiveCountdown": {
+      "deadline": "2026-08-18T14:20:00Z",
+      "sector": "9P515 DXB-LHE",
+      "consequence": "projected to land below reserve fuel if the flight plan isn't re-filed before this time"
+    },
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p26",
+    "title": "USD fuel payment restriction — ALY station requires prepayment or tankering from CAI",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "fuel_availability",
+      "tankering"
+    ],
+    "routes_affected": [
+      "E5321 ALY-JED (SU-AAE)",
+      "E5322 JED-ALY (SU-AAE)"
+    ],
+    "priority": "High",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Fuel Supplier",
+    "description": "Local fuel supplier at Alexandria (ALY) has suspended open-account billing citing USD liquidity constraints (a recurring pattern seen across Egypt/Pakistan/Nigeria in recent years, occasionally forcing foreign carriers to suspend routes entirely). Treasury has arranged prepayment for Aug 18-20 but confirmation is pending; if unresolved by Aug 17 EOD, tanker fuel from Cairo for the ALY-JED-ALY rotation, reviewing payload impact on SU-AAE.",
+    "source": "Manual",
+    "caseStage": "InProgress",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Fuel Supplier. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      }
+    ]
+  },
+  {
+    "id": "p27",
+    "title": "Ground handling shortfall — FEZ/TNG stations reporting ramp delays Aug 17-18",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "turnaround",
+      "airport_slots"
+    ],
+    "routes_affected": [
+      "3O337 FEZ-MPL",
+      "3O338 MPL-FEZ",
+      "3O303 TNG-BOD",
+      "3O304 BOD-TNG"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "ATC",
+    "description": "Contracted ground handler at FEZ and TNG reports ramp staff shortage affecting turnaround times on the Morocco-France rotations; average turnaround now running 15-20min over block. Station manager to confirm minimum-crew coverage for the Aug 17-18 bank or accept knock-on retiming risk into the France ATC action window (see linked alert).",
+    "source": "Manual",
+    "caseStage": "InProgress",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      }
+    ]
+  },
+  {
+    "id": "p28",
+    "title": "Brake/tyre thermal limit — high-frequency SHJ short-haul rotations in peak heat Aug 17",
+    "effective_date": "2026-08-17",
+    "impact_areas": [
+      "turnaround",
+      "performance_penalty"
+    ],
+    "routes_affected": [
+      "G9027 SHJ-DOH",
+      "G9149 SHJ-JED",
+      "G91941 SHJ-AMM"
+    ],
+    "priority": "Low",
+    "risk_level": "Green",
+    "status": "Active",
+    "trigger": "Weather",
+    "description": "Surface temperatures at SHJ exceeding 45°C during the 13:00-17:00Z peak bank are pushing brake temperatures close to the AFM cooling-schedule limit on quick-turn rotations under 45min ground time. No restriction yet, but ground ops to monitor brake temp indication and be prepared to extend turnaround by 10-15min for the 3 tightest-turn rotations rather than dispatch against a hot-brake caution.",
+    "source": "Schedule-Derived",
+    "caseStage": "Acknowledged",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Weather. Cross-checked against network exposure — flagged Green."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      }
+    ]
+  },
+  {
+    "id": "p29",
+    "title": "Cabin oxygen generator AD — fleet compliance check due before Aug 20",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "compliance",
+      "mel_restriction"
+    ],
+    "routes_affected": [
+      "Fleet-wide — chemical oxygen generator batch check"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Maintenance",
+    "description": "OEM service bulletin (elevated to mandatory AD by the state of design) requires inspection of a specific chemical-oxygen-generator batch installed across part of the narrowbody fleet, with compliance deadline Aug 20. Maintenance planning to cross-reference tails against the affected batch number and prioritize inspection ahead of Aug 19 rotations; any non-compliant tail found is not releasable until inspection is closed.",
+    "source": "Manual",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Amber."
+      }
+    ]
+  },
+  {
+    "id": "p30",
+    "title": "Beirut security escalation — G9387/G9388/3L452/3L453 review-basis suspension risk Aug 18",
+    "effective_date": "2026-08-18",
+    "impact_areas": [
+      "airspace_closure",
+      "crew_constraints"
+    ],
+    "routes_affected": [
+      "G9387 SHJ-BEY (A6-ANP)",
+      "G9388 BEY-SHJ (A6-ANP)",
+      "3L452 AUH-BEY (A6-AUJ)",
+      "3L453 BEY-AUH (A6-AUJ)"
+    ],
+    "priority": "Critical",
+    "risk_level": "Red",
+    "status": "Active",
+    "trigger": "Security",
+    "description": "Escalating security reporting around Beirut raises the same rolling-suspension risk that led Gulf carriers to cancel Beirut services on short notice in past regional flare-ups. Security to issue a go/no-go decision for the Aug 18 SHJ-BEY and AUH-BEY rotations by 06:00Z; if suspended, both A6-ANP and A6-AUJ need same-day repositioning cover elsewhere in the network and crew/hotel logistics at BEY need immediate review for any layover already in progress.",
+    "source": "Manual",
+    "precedent": "Air Arabia cancelled Sharjah/Abu Dhabi–Beirut flights on Sep 24, 2024 during the Israel-Hezbollah escalation on a rolling short-notice review basis; Emirates, Etihad and Qatar Airways took equivalent action on Beirut, Baghdad, Basra, Tehran and Amman in the same window.",
+    "caseStage": "New",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Security. Cross-checked against network exposure — flagged Red."
+      }
+    ]
+  },
+  {
+    "id": "p31",
+    "title": "Sudan (KRT) route reinstatement review — phased-reopening risk assessment",
+    "effective_date": "2026-08-19",
+    "impact_areas": [
+      "airspace_closure",
+      "congestion"
+    ],
+    "routes_affected": [
+      "Network Planning — SHJ-KRT not currently scheduled"
+    ],
+    "priority": "Medium",
+    "risk_level": "Amber",
+    "status": "Active",
+    "trigger": "Security",
+    "description": "Commercial has flagged potential reinstatement of SHJ-KRT once Sudanese airspace/Khartoum airport fully normalizes. Current schedule (this 72-hr file) correctly carries no KRT rotation, consistent with the ongoing conflict-risk posture. Before any reinstatement: confirm current HSSS FIR NOTAM status, verify Port Sudan/Egypt/Saudi contingency routing is still current, and treat any 'reopened' status as phased/cautious rather than a full return to normal ops.",
+    "source": "Manual",
+    "precedent": "Sudan's Khartoum airspace has been closed to civil traffic since Apr 2023; even after partial reopening steps, an Il-76 was reportedly shot down near Babanusa in Nov 2025 — operators continue to treat any reopening announcement as phased, not final.",
+    "caseStage": "Resolved",
+    "auditLog": [
+      {
+        "t": "D-1, 07:40Z",
+        "a": "Agent",
+        "x": "Detected via Security. Cross-checked against network exposure — flagged Amber."
+      },
+      {
+        "t": "D-1, 08:15Z",
+        "a": "You",
+        "x": "Acknowledged — reviewing with the relevant desk."
+      },
+      {
+        "t": "D-1, 09:30Z",
+        "a": "You",
+        "x": "Coordinating response with stakeholders; action in progress."
+      },
+      {
+        "t": "D-1, 13:00Z",
+        "a": "Agent",
+        "x": "Confirmed action taken. Marking resolved — will re-open automatically if conditions change."
+      }
+    ]
+  }
+]

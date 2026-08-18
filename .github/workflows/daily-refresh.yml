@@ -1,0 +1,65 @@
+name: Daily Pre-Ops Refresh
+
+# Runs the exact same generate_daily_plan.js we already built and tested —
+# this workflow's only job is to run it on a schedule and publish the
+# result, so there's nothing new to trust here except the scheduling glue.
+
+on:
+  schedule:
+    # 06:00 UTC daily. GitHub's cron scheduler can lag a few minutes under
+    # load — acceptable for a daily ops brief, not for anything second-critical.
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}   # lets you also trigger a run manually from the Actions tab
+
+permissions:
+  contents: write   # needed to commit the refreshed data/plans.json + latest.html back
+  pages: write
+  id-token: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run daily generator
+        working-directory: planning
+        run: node generate_daily_plan.js
+
+      - name: Commit refreshed data + manifest back to the repo
+        run: |
+          git config user.name "preops-agent-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add planning/data planning/manifest.json planning/notifications_log.csv planning/latest.html planning/day_*
+          git diff --staged --quiet || git commit -m "Daily refresh: $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p _site/data
+          cp planning/latest.html _site/index.html
+          cp planning/data/plans.json _site/data/plans.json
+          cp planning/data/notifications.json _site/data/notifications.json
+          cp planning/data/meta.json _site/data/meta.json
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

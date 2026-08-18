@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Ops Intelligence — OCC Alerting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e17;--panel:#111827;--panel2:#1a2332;--panel3:#222d3f;
+  --border:rgba(56,189,248,.1);--border-bright:rgba(56,189,248,.2);
+  --accent:#3BA8AC;--accent-dim:rgba(59,168,172,.1);
+  --red:#f87171;--red-bg:rgba(248,113,113,.06);
+  --amber:#fbbf24;--amber-bg:rgba(251,191,36,.06);
+  --green:#34d399;--green-bg:rgba(52,211,153,.06);
+  --text:#e2e8f0;--muted:#64748b;--dim:#475569;--slate:#94a3b8;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;overflow-x:hidden}
+.mono{font-family:var(--mono)}
+
+/* ══ HEADER ══ */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(180deg,rgba(59,168,172,.04),transparent);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(14px)}
+.hdr-l{display:flex;align-items:center;gap:10px}
+.hdr-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#3BA8AC,#2E8286);display:flex;align-items:center;justify-content:center}
+.hdr-logo svg{width:20px;height:20px;fill:none;stroke:#0a0e17;stroke-width:2.5}
+.hdr-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.hdr-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.hdr-r{display:flex;align-items:center;gap:8px}
+
+/* ══ BUTTONS ══ */
+.btn{padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#0a0e17}
+.btn-primary:hover{background:#2E8286;box-shadow:0 0 20px rgba(59,168,172,.25)}
+.btn-ghost{background:var(--panel2);color:var(--slate);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--border-bright);color:var(--text)}
+.btn-sm{padding:6px 12px;font-size:11px}
+
+/* ══ LAYOUT ══ */
+.layout{display:flex;min-height:calc(100vh - 64px)}
+.side{width:190px;background:var(--panel);border-right:1px solid var(--border);padding:10px 6px;flex-shrink:0;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+.nav-item{padding:9px 12px;border-radius:8px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:1px;display:flex;align-items:center;gap:8px;position:relative}
+.nav-item:hover{background:var(--panel2);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;min-width:18px;text-align:center}
+.nav-badge.red{background:var(--red);color:#0a0e17}
+.nav-badge.amber{background:var(--amber);color:#0a0e17}
+.nav-badge.dim{background:var(--panel3);color:var(--slate)}
+.nav-section{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--dim);font-weight:700;padding:14px 12px 6px}
+
+.main{flex:1;padding:20px;overflow-y:auto;max-height:calc(100vh - 64px)}
+
+/* ══ HERO ══ */
+.hero{display:flex;align-items:center;gap:20px;background:linear-gradient(135deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:16px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:0;right:0;width:240px;height:100%;background:radial-gradient(ellipse at right,rgba(59,168,172,.04),transparent);pointer-events:none}
+.hero-info{flex:1}
+.hero-status{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.hero-sub{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+.hero-stats{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
+.hero-stat{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--slate)}
+.hero-stat-num{font-size:16px;font-weight:700;color:var(--text)}
+.gauge{width:80px;height:80px;flex-shrink:0;position:relative}
+.gauge svg{transform:rotate(-90deg)}
+.gauge-bg{stroke:var(--panel3);stroke-width:8;fill:none}
+.gauge-fill{stroke-width:8;fill:none;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.gauge-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-num{font-size:22px;font-weight:700;line-height:1}
+.gauge-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* ══ KPI ══ */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;position:relative}
+.kpi:hover{border-color:var(--border-bright);transform:translateY(-1px)}
+.kpi.red{border-top:2px solid var(--red)} .kpi.amber{border-top:2px solid var(--amber)} .kpi.accent{border-top:2px solid var(--accent)} .kpi.neutral{border-top:2px solid var(--slate)}
+.kpi-icon{position:absolute;right:10px;top:10px;font-size:18px;opacity:.15}
+.kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700}
+.kpi-val{font-size:24px;font-weight:700;margin-top:4px}
+.kpi-sub{font-size:10px;color:var(--dim);margin-top:2px}
+
+/* ══ FILTER ══ */
+.filter-bar{display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.filter-chip{padding:5px 12px;border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--panel2);color:var(--muted);transition:all .15s}
+.filter-chip:hover{border-color:var(--border-bright)}
+.filter-chip.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(59,168,172,.3)}
+.filter-sep{color:var(--dim);font-size:11px;margin:0 2px}
+.filter-group-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);font-weight:700;margin-right:4px}
+
+/* ══ ALERT CARDS ══ */
+.alert-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .15s}
+.alert-card:hover{border-color:var(--border-bright)}
+.alert-card.red{border-left:3px solid var(--red)} .alert-card.amber{border-left:3px solid var(--amber)} .alert-card.green{border-left:3px solid var(--green)}
+.alert-head{padding:14px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px}
+.alert-icon{width:36px;height:36px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+.alert-icon.red{background:var(--red-bg);color:var(--red)} .alert-icon.amber{background:var(--amber-bg);color:var(--amber)} .alert-icon.green{background:var(--green-bg);color:var(--green)}
+.alert-body{flex:1;min-width:0}
+.alert-title{font-size:13px;font-weight:600;margin-bottom:3px;line-height:1.3}
+.alert-preview{font-size:11px;color:var(--muted);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.alert-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.countdown{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.countdown.urgent{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.countdown.soon{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.countdown.normal{background:var(--panel3);color:var(--slate);border:1px solid var(--border)}
+.trigger-badge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:3px}
+.trigger-auto{background:rgba(59,168,172,.1);color:var(--accent);border:1px solid rgba(59,168,172,.15)}
+.trigger-manual{background:var(--panel3);color:var(--slate);border:1px solid var(--border)}
+.trigger-watch{background:rgba(168,85,247,.1);color:#a855f7;border:1px solid rgba(168,85,247,.15)}
+.source-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;text-transform:uppercase;letter-spacing:.4px}
+.source-live{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2)}
+.source-derived{background:rgba(56,189,248,.1);color:#38bdf8;border:1px solid rgba(56,189,248,.2)}
+.source-extrapolated{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.source-manual{background:var(--panel3);color:var(--slate);border:1px solid var(--border)}
+.carrier-chip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--panel3);color:var(--slate);margin-left:4px}
+.stage-badge{font-size:9px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.4px;display:inline-flex;align-items:center;gap:4px}
+.stage-New{background:rgba(248,113,113,.12);color:var(--red)}
+.stage-Acknowledged{background:rgba(251,191,36,.12);color:var(--amber)}
+.stage-InProgress{background:rgba(59,168,172,.14);color:var(--accent)}
+.stage-Resolved{background:rgba(52,211,153,.12);color:var(--green)}
+.stage-advance-btn{font-size:10px;padding:3px 9px;border-radius:6px;background:var(--panel3);color:var(--slate);border:1px solid var(--border-bright)}
+.stage-advance-btn:hover{background:var(--panel2);color:var(--text)}
+.timeline-row{display:flex;gap:10px;font-size:11px;padding:4px 0;border-bottom:1px solid var(--border)}
+.timeline-row:last-child{border-bottom:none}
+.timeline-time{font-family:var(--mono);color:var(--dim);white-space:nowrap;min-width:78px}
+.pattern-callout{font-size:11px;color:var(--slate);margin-top:8px;padding:9px 11px;background:rgba(251,191,36,.06);border-radius:8px;border-left:2px solid var(--amber);line-height:1.5}
+.predictive-chip{font-family:var(--mono);font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:7px;margin-bottom:10px}
+.predictive-urgent{background:rgba(248,113,113,.14);color:var(--red);border:1px solid rgba(248,113,113,.3)}
+.predictive-ok{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.25)}
+.wallboard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.wallboard-tile{border-radius:8px;padding:10px;cursor:pointer;transition:transform .12s;border:1px solid var(--border)}
+.wallboard-tile:hover{transform:scale(1.03)}
+.wallboard-tile.risk-red{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.35)}
+.wallboard-tile.risk-amber{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.3)}
+.wallboard-tile.risk-green{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3)}
+.view-toggle{display:flex;gap:4px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:3px}
+.view-toggle-btn{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;color:var(--muted);border:none;background:transparent}
+.view-toggle-btn.active{background:var(--accent);color:#0a0e17}
+.exposure-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.exposure-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.exposure-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--slate)}
+.exposure-sub{font-size:10px;color:var(--dim)}
+.exposure-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.exposure-cell{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:9px 10px;cursor:pointer;transition:all .15s}
+.exposure-cell:hover{border-color:var(--border-bright);transform:translateY(-1px)}
+.exposure-num{font-size:18px;font-weight:700;color:var(--accent)}
+.exposure-lbl{font-size:9px;color:var(--muted);margin-top:1px;line-height:1.3}
+.handover-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.handover-overlay.open{display:flex}
+.handover-box{background:var(--panel);border:1px solid var(--border-bright);border-radius:14px;width:min(600px,90vw);max-height:80vh;padding:16px;display:flex;flex-direction:column;gap:10px}
+.handover-hdr{display:flex;align-items:center;justify-content:space-between}
+#handover-text{flex:1;min-height:380px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-family:monospace;font-size:11px;line-height:1.5;resize:none}
+.alert-expand{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
+.alert-card.expanded .alert-expand{max-height:800px;padding:0 16px 14px}
+.alert-card.expanded .chevron{transform:rotate(180deg)}
+.chevron{margin-left:auto;width:16px;height:16px;color:var(--dim);transition:transform .2s;flex-shrink:0}
+.alert-desc{font-size:12px;color:var(--slate);line-height:1.5;margin-top:10px;padding:10px;background:var(--panel2);border-radius:8px}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.tag{padding:3px 9px;border-radius:6px;font-size:10px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.tag-impact{background:var(--panel3);color:var(--slate);border:1px solid var(--border)}
+.tag-sector{background:rgba(56,189,248,.06);color:#38bdf8;border:1px solid rgba(56,189,248,.12)}
+.action-list{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.action-list-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.action-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:11px;color:var(--slate)}
+.action-bullet{color:var(--accent);font-weight:700;flex-shrink:0;margin-top:1px}
+.alert-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.stakeholder-list{display:flex;flex-wrap:wrap;gap:5px}
+.stakeholder{font-size:10px;padding:2px 8px;border-radius:5px;background:var(--panel3);color:var(--slate)}
+.pill{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:inline-flex;align-items:center;gap:3px}
+.pill-red{background:rgba(248,113,113,.1);color:var(--red)} .pill-amber{background:rgba(251,191,36,.1);color:var(--amber)} .pill-green{background:rgba(52,211,153,.1);color:var(--green)}
+.pill-critical{background:rgba(248,113,113,.12);color:var(--red)} .pill-high{background:rgba(251,191,36,.12);color:var(--amber)} .pill-medium{background:rgba(56,189,248,.1);color:#38bdf8} .pill-low{background:var(--panel3);color:var(--slate)}
+
+/* ══ TIMELINE ══ */
+.day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.day-col{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;min-height:200px}
+.day-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.day-name{font-size:13px;font-weight:700}
+.day-date{font-size:10px;color:var(--muted)}
+.day-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px}
+.day-badge.red{background:rgba(248,113,113,.12);color:var(--red)} .day-badge.amber{background:rgba(251,191,36,.12);color:var(--amber)} .day-badge.green{background:rgba(52,211,153,.1);color:var(--green)}
+.day-badge.empty{background:var(--panel3);color:var(--dim)}
+.day-item{background:var(--panel2);border-radius:8px;padding:10px;margin-bottom:8px;border-left:3px solid var(--accent);cursor:pointer;transition:all .15s}
+.day-item:hover{background:var(--panel3);transform:translateX(2px)}
+.day-item.red{border-left-color:var(--red)} .day-item.amber{border-left-color:var(--amber)}
+.day-item-title{font-size:11px;font-weight:600;line-height:1.3;margin-bottom:4px}
+.day-item-meta{font-size:9px;color:var(--muted)}
+.day-empty{text-align:center;padding:20px 0;color:var(--dim);font-size:11px}
+
+/* ══ CONTACTS ══ */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.contact-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .15s}
+.contact-card:hover{border-color:var(--border-bright)}
+.contact-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.contact-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#2E8286);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#0a0e17;flex-shrink:0}
+.contact-name{font-size:13px;font-weight:600}
+.contact-role{font-size:10px;color:var(--accent);font-weight:500;margin-top:1px}
+.contact-info{font-size:11px;color:var(--muted);line-height:1.5}
+.contact-channels{display:flex;gap:5px;margin-top:8px}
+.ch{font-size:9px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);font-weight:600}
+.ch-on{background:var(--accent-dim);color:var(--accent)} .ch-off{background:var(--panel3);color:var(--dim);text-decoration:line-through}
+
+/* ══ NOTIFICATIONS ══ */
+.notif-table{width:100%;border-collapse:collapse}
+.notif-table th{text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--border)}
+.notif-table td{padding:10px;font-size:11px;border-bottom:1px solid var(--border);vertical-align:middle}
+.notif-table tr:hover td{background:var(--panel2)}
+.status-badge{font-size:10px;padding:3px 8px;border-radius:5px;font-weight:600}
+.status-pending{background:rgba(251,191,36,.1);color:var(--amber)} .status-sent{background:rgba(56,189,248,.1);color:#38bdf8} .status-acknowledged{background:rgba(52,211,153,.1);color:var(--green)} .status-actioned{background:rgba(52,211,153,.12);color:var(--green)} .status-escalated{background:rgba(248,113,113,.1);color:var(--red)}
+
+/* ══ ADD FORM ══ */
+.form-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:720px}
+.form-section{margin-bottom:16px}
+.form-sec-title{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-field{display:flex;flex-direction:column;gap:3px}
+.form-full{grid-column:1/-1}
+.form-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.form-input{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:12px;font-family:inherit;transition:border-color .15s}
+.form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,168,172,.1)}
+.form-input::placeholder{color:var(--dim)}
+textarea.form-input{resize:vertical}
+select.form-input{cursor:pointer}
+.chip-group{display:flex;flex-wrap:wrap;gap:6px}
+.chip-opt{padding:7px 12px;border-radius:8px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--panel2);color:var(--muted);transition:all .15s;font-weight:500;display:flex;align-items:center;gap:5px}
+.chip-opt:hover{border-color:var(--border-bright)}
+.chip-opt.selected{background:var(--accent-dim);color:var(--accent);border-color:rgba(59,168,172,.3)}
+.form-preview{margin-top:14px;padding:14px;background:var(--panel2);border-radius:10px;border:1px solid var(--border)}
+.form-preview-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:8px}
+.preview-risk{font-size:14px;font-weight:700}
+
+/* ══ SCENARIO LIBRARY ══ */
+.scenario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:12px}
+.scenario-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s}
+.scenario-card:hover{border-color:var(--border-bright);transform:translateY(-1px)}
+.scenario-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.scenario-icon{font-size:20px}
+.scenario-title{font-size:12px;font-weight:600}
+.scenario-desc{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:8px}
+.scenario-tags{display:flex;flex-wrap:wrap;gap:4px}
+.scenario-tag{font-size:9px;padding:2px 6px;border-radius:4px;background:var(--panel3);color:var(--slate)}
+.scenario-tag.trigger{background:rgba(168,85,247,.08);color:#a855f7}
+.scenario-tag.impact{background:rgba(56,189,248,.06);color:#38bdf8}
+
+/* ══ EMPTY STATE ══ */
+.empty-state{text-align:center;padding:40px 20px;color:var(--dim)}
+.empty-state-icon{font-size:36px;margin-bottom:8px;opacity:.3}
+.empty-state-text{font-size:13px}
+
+/* ══ MISC ══ */
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;position:relative}
+.live-dot::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:1px solid var(--green);animation:pulse-ring 2.2s ease-out infinite}
+@keyframes pulse-ring{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.4);opacity:0}}
+.fab{position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:var(--accent);color:#0a0e17;border:none;cursor:pointer;font-size:22px;font-weight:700;box-shadow:0 4px 20px rgba(59,168,172,.3);transition:all .2s;z-index:90;display:flex;align-items:center;justify-content:center}
+.fab:hover{transform:scale(1.08);box-shadow:0 6px 25px rgba(59,168,172,.4)}
+.view{display:none}
+.view.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.sec-title{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec-dot{width:8px;height:8px;border-radius:50%}
+
+@media(max-width:768px){
+  .side{display:none}.kpi-row{grid-template-columns:repeat(2,1fr)}.form-row{grid-template-columns:1fr}
+  .hero{flex-direction:column;text-align:center}.main{padding:14px}
+  .view-toggle{width:100%}.view-toggle-btn{flex:1}
+  .wallboard-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-logo"><svg viewBox="0 0 24 24"><path d="M2 16l20-7L2 2l3 7-3 7z" stroke-linejoin="round" stroke-linecap="round"/></svg></div>
+    <div><div class="hdr-title">Pre-Ops Intelligence</div><div class="hdr-sub"><span class="live-dot"></span> <span id="hdr-live-status">Scanning 3-day operational horizon</span></div></div>
+  </div>
+  <div class="hdr-r">
+    <div class="btn btn-ghost btn-sm" id="today-chip">—</div>
+    <button class="btn btn-ghost btn-sm" onclick="openHandover()">📋 Shift Handover</button>
+    <button class="btn btn-primary btn-sm" onclick="showView('add-plan')">+ New Plan</button>
+  </div>
+</div>
+
+<!-- GENERATION STATUS STRIP -->
+<div id="gen-status-strip" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--panel);border-bottom:1px solid var(--border);padding:7px 20px;font-size:11px;color:var(--muted)">
+  <span id="gen-status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--dim);display:inline-block;flex-shrink:0"></span>
+  <span id="gen-generated-at">Generated: —</span>
+  <span style="color:var(--dim)">·</span>
+  <span id="gen-next-scheduled">Next scheduled refresh: —</span>
+  <span style="color:var(--dim)">·</span>
+  <span id="gen-source-note">Source: local file — not yet deployed to a scheduled host</span>
+  <button class="btn btn-ghost btn-sm" id="gen-refresh-btn" style="margin-left:auto;padding:3px 10px;font-size:10px" onclick="refreshDataInPlace()">🔄 Refresh data now</button>
+</div>
+
+<div class="handover-overlay" id="handover-overlay" onclick="if(event.target===this)closeHandover()">
+  <div class="handover-box">
+    <div class="handover-hdr">
+      <div style="font-size:14px;font-weight:700">📋 Shift Handover Summary</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="copyHandover(this)">📄 Copy</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeHandover()">✕ Close</button>
+      </div>
+    </div>
+    <textarea id="handover-text" readonly></textarea>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="side">
+    <div class="nav-section">Monitor</div>
+    <div class="nav-item active" onclick="showView('dashboard')" id="nav-dashboard">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+    <div class="nav-item" onclick="showView('alerts')" id="nav-alerts">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z M12 9v4 M12 17h.01"/></svg>
+      Active Alerts<span class="nav-badge red" id="badge-alerts">0</span></div>
+    <div class="nav-item" onclick="showView('timeline')" id="nav-timeline">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>3-Day Timeline</div>
+    <div class="nav-item" onclick="showView('scenarios')" id="nav-scenarios">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Scenario Library</div>
+
+    <div class="nav-item" onclick="showView('route-brief')" id="nav-route-brief">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>Route Brief</div>
+    <div class="nav-item" onclick="showView('weather')" id="nav-weather">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>Live Weather</div>
+    <div class="nav-item" onclick="showView('notam')" id="nav-notam">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>NOTAM Parser</div>
+
+    <div class="nav-section">Manage</div>
+    <div class="nav-item" onclick="showView('contacts')" id="nav-contacts">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87 M16 3.13a4 4 0 010 7.75"/></svg>OCC Contacts</div>
+    <div class="nav-item" onclick="showView('notifications')" id="nav-notifications">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 01-3.46 0"/></svg>Notifications</div>
+    <div class="nav-item" onclick="showView('add-plan')" id="nav-add-plan">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Log New Plan</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="view active" id="view-dashboard">
+      <div class="hero" id="hero-banner"></div>
+      <div class="exposure-panel" id="exposure-panel"></div>
+      <div class="kpi-row" id="kpi-row"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+        <div class="filter-bar" id="filter-bar" style="margin-bottom:0"></div>
+        <div class="view-toggle">
+          <button class="view-toggle-btn active" id="toggle-detailed" onclick="setBoardView('detailed')">☰ Detailed</button>
+          <button class="view-toggle-btn" id="toggle-wallboard" onclick="setBoardView('wallboard')">▦ Wallboard</button>
+        </div>
+      </div>
+      <div id="alert-list"></div>
+      <div id="wallboard-view" style="display:none"></div>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="view" id="view-alerts">
+      <div class="sec-title"><div class="sec-dot" style="background:var(--red)"></div> All Active Alerts</div>
+      <div class="filter-bar" id="filter-bar-2"></div>
+      <div id="alert-list-full"></div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="view" id="view-timeline">
+      <div class="sec-title"><div class="sec-dot" style="background:var(--accent)"></div> 3-Day Operational Timeline</div>
+      <div class="day-grid" id="day-grid"></div>
+    </div>
+
+    <!-- SCENARIOS -->
+    <div class="view" id="view-scenarios">
+      <div class="sec-title"><div class="sec-dot" style="background:#a855f7"></div> Scenario Library — Click to Pre-fill Alert</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Real-world operational scenarios the Pre-Ops agent monitors. Click any card to pre-fill the alert form.</div>
+      <div class="scenario-grid" id="scenario-grid"></div>
+    </div>
+
+    <!-- CONTACTS -->
+    <div class="view" id="view-contacts">
+      <div class="sec-title"><div class="sec-dot" style="background:var(--accent)"></div> OCC Contact Directory</div>
+      <div class="contact-grid" id="contact-grid"></div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="view" id="view-notifications">
+      <div class="sec-title"><div class="sec-dot" style="background:var(--accent)"></div> Notification History</div>
+      <table class="notif-table">
+        <thead><tr><th>Date</th><th>Plan</th><th>Risk</th><th>Priority</th><th>Contacts Notified</th><th>Status</th></tr></thead>
+        <tbody id="notif-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- ADD PLAN -->
+    <div class="view" id="view-add-plan">
+      <div class="sec-title"><div class="sec-dot" style="background:var(--accent)"></div> Log New Pre-Ops Plan</div>
+      <div class="form-card">
+        <div class="form-section">
+          <div class="form-sec-title">📋 Plan Details</div>
+          <div class="form-row"><div class="form-field form-full">
+            <div class="form-label">Plan Title *</div>
+            <input class="form-input" id="f-title" placeholder="e.g. Airspace closure over Yemen — rerouting required">
+          </div></div>
+          <div class="form-row">
+            <div class="form-field"><div class="form-label">Effective Date *</div><input class="form-input" id="f-date" type="date"></div>
+            <div class="form-field"><div class="form-label">Priority</div><select class="form-input" id="f-priority"><option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+          </div>
+          <div class="form-row"><div class="form-field form-full">
+            <div class="form-label">Description</div>
+            <textarea class="form-input" id="f-desc" rows="2" placeholder="Detailed description of the plan and operational notes…"></textarea>
+          </div></div>
+        </div>
+        <div class="form-section">
+          <div class="form-sec-title">⚠️ Impact Areas (select all that apply)</div>
+          <div class="chip-group" id="impact-chips"></div>
+        </div>
+        <div class="form-section">
+          <div class="form-sec-title">🛫 Affected Sectors & Routes</div>
+          <div class="form-field form-full"><div class="form-label">Sector / Route codes (comma-separated)</div>
+            <input class="form-input" id="f-routes" placeholder="G9401 SHJ-MCT, G9402 MCT-SHJ, G9380 SHJ-CMB"></div>
+          <div class="form-row" style="margin-top:10px">
+            <div class="form-field"><div class="form-label">Aircraft Registration</div><input class="form-input" id="f-ac" placeholder="A6-EDO (optional)"></div>
+            <div class="form-field"><div class="form-label">Trigger Source</div><select class="form-input" id="f-source"><option selected>Manual</option><option>NOTAM</option><option>Schedule</option><option>Maintenance</option><option>Weather</option><option>Crew System</option><option>Permit Expiry</option><option>Fuel Supplier</option><option>ATC</option><option>Security</option></select></div>
+          </div>
+        </div>
+        <div class="form-preview" id="risk-preview">
+          <div class="form-preview-title">⚡ Live Risk Assessment</div>
+          <div class="preview-risk" id="preview-risk-text">Select impact areas to see risk level</div>
+          <div id="preview-detail" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="submitPlan()">⚡ Analyze & Create Alert</button>
+          <button class="btn btn-ghost" onclick="resetForm()">Clear Form</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+    <!-- ══ ROUTE BRIEF VIEW ══ -->
+    <div class="view" id="view-route-brief">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">Route Brief — Weather + NOTAM</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Enter departure and arrival airports to get a combined weather + NOTAM brief for all airports on the route.</p>
+      <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
+        <div><label style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Departure</label><input id="rb-dep" placeholder="ICAO e.g. OMSJ" style="width:120px;padding:8px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit;text-transform:uppercase" maxlength="4"></div>
+        <div style="font-size:18px;color:var(--dim);padding-bottom:8px">→</div>
+        <div><label style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Arrival</label><input id="rb-arr" placeholder="ICAO e.g. VTBS" style="width:120px;padding:8px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit;text-transform:uppercase" maxlength="4"></div>
+        <div><label style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px">Diversions</label><input id="rb-div" placeholder="comma-separated" style="width:200px;padding:8px 12px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit;text-transform:uppercase"></div>
+        <button class="btn btn-primary" onclick="fetchRouteBrief()">Generate Brief</button>
+      </div>
+      <div id="route-brief-content" style="min-height:200px">
+        <div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 20px">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px"><circle cx="12" cy="12" r="10"/><path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
+          <div>Enter your route above and click Generate Brief</div>
+          <div style="font-size:11px;margin-top:4px">72-hour weather + NOTAM data for all airports</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LIVE WEATHER VIEW ══ -->
+    <div class="view" id="view-weather">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px">
+        <div><h2 style="font-size:18px;font-weight:700;margin-bottom:4px">Live Weather Monitor</h2>
+        <p style="font-size:12px;color:var(--muted)">Official METAR/TAF (NOAA AWC, free/no key) + 3-day forecast &amp; recent history (Tomorrow.io, needs your key below)</p></div>
+        <button class="btn btn-primary" onclick="fetchWeatherAll()">Scan METAR Now</button>
+      </div>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <label style="font-size:11px;color:var(--muted);white-space:nowrap">Tomorrow.io API Key:</label>
+        <input type="password" id="tio-key" placeholder="Paste your key (kept in-memory only, never saved to file)" style="flex:1;min-width:220px;background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px">
+        <button class="btn btn-ghost btn-sm" onclick="toggleKeyVisibility()">👁</button>
+        <button class="btn btn-primary btn-sm" onclick="fetchTomorrowAll()">Fetch 3-Day Forecast + Recent History</button>
+      </div>
+      <div id="tio-content" style="min-height:40px;margin-bottom:16px"></div>
+      <div id="weather-content" style="min-height:200px">
+        <div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 20px">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:8px"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
+          <div>Click Scan METAR Now for official conditions, or fetch the Tomorrow.io forecast above</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ NOTAM PARSER VIEW ══ -->
+    <div class="view" id="view-notam">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:4px">NOTAM Parser</h2>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Paste raw NOTAM text (standard ICAO format) to get structured risk/impact/action output. Runs entirely offline in your browser — no external NOTAM API exists that's both free and global, so this parses text you provide from your own NOTAM source.</p>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="fillNotamExample('runway')">Runway Closure Example</button>
+        <button class="btn btn-ghost btn-sm" onclick="fillNotamExample('airspace')">Airspace Closure Example</button>
+        <button class="btn btn-ghost btn-sm" onclick="fillNotamExample('ils')">ILS Unserviceable Example</button>
+      </div>
+      <textarea id="notam-input" placeholder="Paste NOTAM text here..." style="width:100%;min-height:120px;padding:12px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px;font-family:monospace;resize:vertical;margin-bottom:10px"></textarea>
+      <button class="btn btn-primary" onclick="parseNotamText()">Parse NOTAM</button>
+      <div id="notam-result" style="margin-top:16px"></div>
+    </div>
+
+<button class="fab" onclick="showView('add-plan')" title="Log new plan">+</button>
+
+<script>
+// ══ DATA: REAL-WORLD SCENARIOS ══
+// Populated by generate_daily_plan.js at build time. If you're seeing the
+// placeholder values below, this file was opened directly rather than
+// produced by a real generator run — that's the tell that nothing is
+// actually scheduled yet.
+const GENERATION_INFO = {"generated_at":"__PLACEHOLDER__","next_scheduled_utc":"__PLACEHOLDER__","source":"local file — not yet deployed to a scheduled host","deployed":false};
+
+const PLANS = [
+  // --- AIRSPACE ---
+  {"id":"p1","title":"Yemen airspace closure — rerouting required for 3 sectors","effective_date":"2026-08-18","impact_areas":["airspace_closure","fuel_availability","crew_constraints"],"routes_affected":["G9401 SHJ-MCT","G9402 MCT-SHJ","G9380 SHJ-CMB"],"priority":"Critical","risk_level":"Red","status":"Active","trigger":"NOTAM","description":"NOTAM A1234 issued for partial airspace closure over Yemen corridor Aug 18-19. Rerouting required for G9401/G9402 SHJ-MCT and G9380 SHJ-CMB via OMAN FIR. Additional fuel burn 800kg/sector, +25min flight time. Crew FTL implications on long-haul connections.","caseStage":"Resolved","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via NOTAM. Cross-checked against network exposure — flagged Red."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}, {"t": "D-1, 13:00Z", "a": "Agent", "x": "Confirmed action taken. Marking resolved — will re-open automatically if conditions change."}]},
+  {"id":"p2","title":"Iran FIR military exercise — transit restrictions Aug 18-19","effective_date":"2026-08-18","impact_areas":["airspace_closure","airport_slots"],"routes_affected":["G9331 SHJ-IST","G9220 SHJ-THR"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"NOTAM","description":"Military exercise in Tehran FIR restricting FL340-FL410. Transit flights to IST and THR may need lower FLs or rerouting via Turkey. Expect 15-20min delay on affected sectors.","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via NOTAM. Cross-checked against network exposure — flagged Amber."}]},
+
+  // --- MEL / MAINTENANCE ---
+  {"id":"p3","title":"MEL restriction A6-EDO — CAT II/III ops limited for KRT & CAI","effective_date":"2026-08-17","impact_areas":["mel_restriction","crew_constraints"],"routes_affected":["G9123 SHJ-KRT","G9456 SHJ-CAI"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"Maintenance","description":"A6-EDO MEL item 32-12 (Nose Wheel Steering) restricts CAT II/III operations. Aircraft planned on G9123 SHJ-KRT and G9456 SHJ-CAI on Aug 17. Destinations require CAT II capability due to fog season. Coordinate with maintenance for rectification or swap to A6-EER.","caseStage":"InProgress","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}]},
+  {"id":"p4","title":"A6-EER scheduled for C-check — fleet utilization gap Aug 17-19","effective_date":"2026-08-17","impact_areas":["crew_constraints"],"routes_affected":["All A320 rotations"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"Maintenance","description":"A6-EER enters scheduled C-check Aug 17 for 3 days. Fleet reduced to 31 aircraft. Peak wave coverage tight at 14:00-18:00Z. Crew rostering needs to account for reduced availability. Consider re-timing one rotation or wet-lease coverage.","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Amber."}]},
+
+  // --- WEATHER ---
+  {"id":"p5","title":"Dense fog forecast SHJ — CAT I only operations Aug 18 morning","effective_date":"2026-08-18","impact_areas":["weather","airport_slots","crew_constraints"],"routes_affected":["G9101 SHJ-CAI","G9103 SHJ-BAH","G9107 SHJ-MCT","G9109 SHJ-KHI"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"Weather","description":"METAR trend indicates radiation fog at SHJ 02:00-06:00Z Aug 18. RVR expected 300-500m, CAT I only. 4 departures in window may face weather delays of 30-90min. Coordinate with ATC for slot management and ensure MEL-free CAT II/III aircraft on stand.","caseStage":"Acknowledged","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Weather. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+  {"id":"p6","title":"Sandstorm warning — DXB/SHJ visibility <1500m Aug 19","effective_date":"2026-08-19","impact_areas":["weather","fuel_availability"],"routes_affected":["All SHJ departures","SHJ arrivals bank"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Weather","description":"ACC forecast warns of rising sand Aug 19 afternoon, visibility dropping to 1500m. SHJ arrivals may require holding fuel or diversions to AUH/MCT. Load extra contingency fuel on 6 affected sectors. Brief crew on low-vis taxi procedures.","caseStage":"InProgress","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Weather. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}]},
+
+  // --- FUEL ---
+  {"id":"p7","title":"Tankering required — KRT fuel unavailability for G9123 Aug 19","effective_date":"2026-08-19","impact_areas":["fuel_availability","tankering"],"routes_affected":["G9123 SHJ-KRT"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"Fuel Supplier","description":"KRT fuel supplier confirms unavailability Aug 19 due to refinery maintenance. Tankering required from SHJ on G9123. Extra fuel uplift increases MTOW — payload restriction ~1.2T on SHJ-KRT sector. Coordinate with dispatch and load control.","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Fuel Supplier. Cross-checked against network exposure — flagged Amber."}]},
+
+  // --- CREW / FTL ---
+  {"id":"p8","title":"Crew FTL risk — 3 pilots approaching 900-hour annual limit","effective_date":"2026-08-18","impact_areas":["crew_constraints"],"routes_affected":["G9401 SHJ-MCT","G9220 SHJ-THR","G9331 SHJ-IST"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Crew System","description":"3 Captains (Capt. Rahman, Capt. Yusuf, Capt. Ali) approaching 900-hour annual FTL limit by Aug 31. Roster planning needs to distribute their remaining hours. If not managed, 3 sectors may need crew swaps starting Aug 18. Crew scheduling to issue revised roster by Aug 16.","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Crew System. Cross-checked against network exposure — flagged Amber."}]},
+
+  // --- PERMITS ---
+  {"id":"p9","title":"Overflight permit expiry — Sudan FIR Aug 19","effective_date":"2026-08-19","impact_areas":["airspace_closure"],"routes_affected":["G9123 SHJ-KRT","G9501 SHJ-NBO","G9307 SHJ-JNB"],"priority":"Critical","risk_level":"Red","status":"Active","trigger":"Permit Expiry","description":"Sudan FIR overflight permit expires Aug 19. Renewal submitted Aug 13 but confirmation pending from Khartoum ATC. 3 sectors transit Sudan FIR daily. If permit lapses, rerouting via Egypt FIR adds 45min + 1200kg fuel per sector. Escalate to External Affairs if no confirmation by Aug 18.","caseStage":"Acknowledged","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Permit Expiry. Cross-checked against network exposure — flagged Red."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+
+  // --- ATC / SLOTS ---
+  {"id":"p10","title":"MCT slot constraints — runway maintenance 02:00-05:00Z Aug 17","effective_date":"2026-08-17","impact_areas":["airport_slots","watch_hours"],"routes_affected":["G9110 MCT-SHJ","G9111 SHJ-MCT","G9205 MCT-BKK","G9302 MCT-DEL"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"ATC","description":"OACC advises MCT runway maintenance 02:00-05:00Z Aug 17. No departures/arrivals during window. 4 sectors scheduled in window — 2 need retiming by ±60min. Coordinate slot changes with MCT airport coordination by Aug 16 EOD.","caseStage":"InProgress","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}]},
+
+  // --- SECURITY ---
+  {"id":"p11","title":"Security advisory — BKK political gathering Aug 19","effective_date":"2026-08-19","impact_areas":["crew_constraints","airport_slots"],"routes_affected":["G9205 MCT-BKK","G9206 BKK-MCT"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Security","description":"Embassy advisory for large political gathering near Bangkok Suvarnabhumi Aug 19. Road access to BKK airport may be disrupted. Crew layover logistics need review — ensure hotel transport backup plan. Crew scheduling to confirm crew willingness and arrange alternate transport. No flight cancellation anticipated but ground delays possible.","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Security. Cross-checked against network exposure — flagged Amber."}]},
+
+  // --- VVIP ---
+  {"id":"p12","title":"VVIP movement SHJ — GA Runway closure 10:00-11:30Z Aug 18","effective_date":"2026-08-18","impact_areas":["runway_closure","airport_slots"],"routes_affected":["G9107 SHJ-MCT","G9109 SHJ-KHI","G9111 SHJ-MCT"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"ATC","description":"VVIP movement requires GA Runway closure 10:00-11:30Z Aug 18. 3 departures in window need re-slotting to RWY 31 or timing adjustment. Coordinate with SHJ ATC for departure sequence. Fuel planning for potential ground holding.","caseStage":"Acknowledged","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+
+  // --- SEASONAL ---
+  {"id":"p13","title":"Hajj extra sections — 4 additional flights Aug 18-19","effective_date":"2026-08-18","impact_areas":["crew_constraints","airport_slots","fuel_availability"],"routes_affected":["G9H01 SHJ-JED","G9H02 JED-SHJ","G9H03 SHJ-JED","G9H04 JED-SHJ"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"Schedule","description":"4 Hajj extra sections scheduled Aug 18-19 SHJ-JED roundtrips. Requires 4 dedicated aircraft + 8 crews (4 pilots + 4 cabin crews). Impact on regular schedule: 2 aircraft pulled from MCT/CAI rotations for Hajj coverage. Slot coordination with JED required — tight parking at Hajj terminal. Fuel pre-order at JED.","caseStage":"Acknowledged","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Schedule. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+
+  // --- NEW: ETOPS / DIVERSION ALTERNATE (from 72hr schedule, Bay of Bengal / Andaman sector group) ---
+  {"id":"p14","title":"Chennai ETOPS alternate runway closure — reduced diversion coverage on Bay of Bengal sectors","effective_date":"2026-08-18","impact_areas":["etops_alternate","fuel_availability"],"routes_affected":["G9802 SHJ-KUL (A6-ATA)","G9714 SHJ-HKT (A6-ATF)","G9520 SHJ-CGP (A6-AQQ)"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"NOTAM","description":"NOTAM confirms VOMM (Chennai) RWY 07/25 closed for resurfacing 18-20 Aug, removing the primary ETOPS-120 enroute alternate for the SHJ-KUL, SHJ-HKT and SHJ-CGP overwater legs flown on A320/321-family aircraft. Re-plan diversion coverage via Bengaluru/Colombo; verify revised ETOPS entry/exit points and re-file computerized flight plans. Confirm crew briefing includes revised alternate minima and fuel reserve.","source":"Schedule-Derived","caseStage":"Acknowledged","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via NOTAM. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+
+  // --- NEW: FDP EXTENSION / COMMANDER'S DISCRETION ---
+  {"id":"p15","title":"FDP extension risk — G9821 SHJ-BKK late departure impacts return crew duty","effective_date":"2026-08-17","impact_areas":["fdp_extension","crew_constraints"],"routes_affected":["G9821 SHJ-BKK (A6-ARL)","G9822 BKK-SHJ (A6-ARH)"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"Crew System","description":"G9821 SHJ-BKK (STD 18:15Z) forecast to depart 90min late on ATFM ground delay at BKK. Rostered commander's FDP on the outbound sector projects to exceed the un-extended limit by report time for the following day's early BKK-SHJ return. Crew scheduling to pre-clear commander's discretion criteria or arrange standby crew at BKK before departure to avoid disruption to G9822.","source":"Schedule-Derived","caseStage":"Acknowledged","patternNote":"This is the 3rd time in 5 days this exact rotation (SHJ-BKK-SHJ) has triggered an FDP-risk alert. A single delay is normal; a repeat pattern usually means the rotation itself is scheduled too tight for realistic BKK turnarounds — worth a roster review, not just another one-off fix.","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Crew System. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+
+  // --- NEW: GPS / NAV INTERFERENCE (Iraq/Levant conflict-adjacent FIRs) ---
+  {"id":"p16","title":"GPS jamming advisory — Baghdad/Erbil/Aleppo FIR RNAV approaches degraded","effective_date":"2026-08-18","impact_areas":["gps_interference","airspace_closure"],"routes_affected":["G9368 SHJ-BGW (A6-ANR)","G9357 SHJ-EBL (A6-ARB)","G9351 SHJ-ALP (A6-AOH)"],"priority":"Critical","risk_level":"Red","status":"Active","trigger":"ATC","description":"Multiple GNSS-interference reports filed in Baghdad and Damascus FIR over the last 48h consistent with regional jamming/spoofing. RNAV(GNSS) approaches at BGW, EBL and ALP may be unreliable — crews to plan conventional (ILS/VOR) approach backup and brief on INS/IRS cross-check procedures. Dispatch to review RAIM prediction and file conventional alternates with full non-RNAV approach capability.","source":"Manual","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via ATC. Cross-checked against network exposure — flagged Red."}]},
+
+  // --- NEW: HOT & HIGH / PERFORMANCE PENALTY (Aug heat, Gulf/KSA network) ---
+  {"id":"p17","title":"Extreme heat performance penalty — JED/RUH/MED afternoon departures Aug 17-19","effective_date":"2026-08-17","impact_areas":["performance_penalty","fuel_availability"],"routes_affected":["G9155 RUH-SHJ (A6-AQF)","G9148 JED-SHJ (A6-ATH)","G9176 MED-SHJ (A6-AQN)","G9149 SHJ-JED (A6-AQH)"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Weather","description":"ACC forecast +47°C surface temps at JED/RUH/MED 11:00-15:00Z window Aug 17-19. Afternoon departures on these routes face V1/VR performance-limited TOW; expect payload restriction 300-900kg or retiming to cooler windows where slots allow. Load control to run temperature-corrected performance for each affected sector and flag any cargo/pax offload requirement 3h before STD.","source":"Schedule-Derived","caseStage":"InProgress","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Weather. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}]},
+
+  // --- NEW: INDUSTRIAL ACTION / ATC STRIKE (French airspace, Morocco routes) ---
+  {"id":"p18","title":"France ATC industrial action — CDG/LYS/BOD/MPL rotations at risk Aug 19","effective_date":"2026-08-19","impact_areas":["industrial_action","airport_slots"],"routes_affected":["3O827 RBA-CDG","3O341 CMN-LYS","3O303 TNG-BOD","3O337 FEZ-MPL"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"ATC","description":"French DGAC/unions have called a one-day ATC strike Aug 19 with minimum-service requirements at CDG, LYS, BOD and MPL. Expect 20-40% flight programme reduction directive and mandatory pre-notification (\"pre-notif\") filing by carriers 48h prior. Commercial to confirm which of the 4 daily France rotations must be cancelled or consolidated; notify affected passengers per EU261 obligations and hold aircraft/crew for re-planned rotations.","source":"Manual","caseStage":"InProgress","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}]},
+
+  // --- NEW: SYSTEMS / CYBER OUTAGE ---
+  {"id":"p19","title":"Flight planning system degraded — manual dispatch contingency network-wide","effective_date":"2026-08-17","impact_areas":["cyber_system","crew_constraints"],"routes_affected":["All network — dispatch/flight planning function"],"priority":"Critical","risk_level":"Red","status":"Active","trigger":"Manual","description":"Primary flight-planning/EFB data provider reporting intermittent outage affecting NOTAM feed, weight & balance and computerized flight plan generation. Activate manual dispatch contingency procedure — paper W&B, backup NOTAM briefing pack, and voice coordination with OCC for all departures until system confirmed stable. Prioritize Critical/Red sectors (ETOPS, hot & high, permit-constrained) for manual verification first.","source":"Manual","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Manual. Cross-checked against network exposure — flagged Red."}]},
+
+  // --- NEW: ETOPS CERTIFICATION / TAIL CURRENCY ---
+  {"id":"p20","title":"ETOPS currency check due — A6-ATF and A6-ATA approaching recheck window","effective_date":"2026-08-19","impact_areas":["etops_alternate","mel_restriction"],"routes_affected":["G9714 SHJ-HKT (A6-ATF)","G9802 SHJ-KUL (A6-ATA)"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Maintenance","description":"Fleet tracking flags A6-ATF and A6-ATA ETOPS airworthiness recheck (APU/fuel system reliability package) due within 72h. Both tails are rostered on overwater ETOPS-120 sectors to HKT and KUL Aug 19. Maintenance to confirm recheck completion or swap to a current-certified tail before dispatch; do not release on ETOPS sector pending confirmation.","source":"Schedule-Derived","caseStage":"Acknowledged","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+
+  // --- NEW: REDUCED CREW REST / LAYOVER DISRUPTION ---
+  {"id":"p21","title":"Layover hotel disruption — BKK/KUL crew rest facility overbooked Aug 18","effective_date":"2026-08-18","impact_areas":["crew_constraints","fdp_extension"],"routes_affected":["G9822 BKK-SHJ (A6-ARH)","G9803 KUL-SHJ (A6-ATA)"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Crew System","description":"Contracted layover hotel at BKK reports an overbooking event affecting confirmed crew rooms for the night of Aug 17/18, risking non-compliant rest before the early Aug 18 return sectors. Crew services to confirm alternate WOCL-compliant accommodation immediately or trigger standby crew cover; do not accept reduced-rest crew for dispatch without a compliant rest declaration.","source":"Schedule-Derived","caseStage":"Resolved","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Crew System. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}, {"t": "D-1, 13:00Z", "a": "Agent", "x": "Confirmed action taken. Marking resolved — will re-open automatically if conditions change."}]},
+
+  // --- NEW: WILDLIFE HAZARD / BIRD STRIKE NOTAM ---
+  {"id":"p22","title":"Bird activity NOTAM — SHJ increased strike risk during evening departure bank","effective_date":"2026-08-17","impact_areas":["airport_slots","weather"],"routes_affected":["G9027 SHJ-DOH","G9149 SHJ-JED","G91941 SHJ-AMM"],"priority":"Low","risk_level":"Green","status":"Active","trigger":"NOTAM","description":"SHJ Airport NOTAM reports elevated bird activity near the RWY 12 threshold during the 17:00-20:00Z evening departure bank, linked to seasonal migration. No operational restriction issued; crews to brief on bird-strike avoidance procedure and report any strike immediately for post-flight inspection. Ground ops running additional wildlife dispersal patrols.","source":"Schedule-Derived","caseStage":"Resolved","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via NOTAM. Cross-checked against network exposure — flagged Green."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}, {"t": "D-1, 13:00Z", "a": "Agent", "x": "Confirmed action taken. Marking resolved — will re-open automatically if conditions change."}]},
+
+  // --- NEW: DIPLOMATIC / STATE OVERFLIGHT CLEARANCE ---
+  {"id":"p23","title":"Diplomatic overflight clearance pending — Jordan/Lebanon sectors Aug 19","effective_date":"2026-08-19","impact_areas":["airspace_closure"],"routes_affected":["G91941 SHJ-AMM","G9330 SHJ-AMM","3L452 AUH-BEY"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Permit Expiry","description":"Annual diplomatic overflight clearance renewal for Jordanian and Lebanese airspace is pending confirmation ahead of Aug 19 expiry of the current approval. External Affairs submitted renewal Aug 13; no written confirmation received. If unconfirmed by Aug 18 EOD, affected sectors must file reroute via alternate FIR with revised fuel/time — escalate to avoid last-minute flight planning changes.","source":"Manual","caseStage":"Acknowledged","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Permit Expiry. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+
+  // ── ROUND 2: precedent-grounded, network-derived ──
+  {"id":"p24","title":"Fleet-wide engine AD inspection — 4 A320neo-family tails grounded through Aug 20","effective_date":"2026-08-17","impact_areas":["fleet","mel_restriction"],"routes_affected":["A6-AQU (SHJ-KHI/SHJ-DOH rotations)","A6-ARI (SHJ-MUX rotation)","A6-AQN (SHJ-DMM/SHJ-RUH rotations)","A6-ATG (SHJ-DAC/SHJ-JED rotations)"],"priority":"Critical","risk_level":"Red","status":"Active","trigger":"Maintenance","description":"OEM airworthiness directive requires immediate borescope inspection of 4 A320neo-family tails following a powder-metal contamination alert on the installed engine variant (same defect class that has grounded up to a quarter of comparable A320neo operators' fleets, e.g. Wizz Air's ~240-aircraft fleet, since 2023). Inspection slot takes 3-5 days per tail at SHJ; no swap capacity for all 4 simultaneously. Fleet planning to sequence inspections and identify wet-lease/charter cover for the highest-priority rotations first.","source":"Schedule-Derived","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Red."}]},
+  {"id":"p25","title":"Reroute congestion via Oman/Arabian Sea corridor — Pakistan-bound sectors Aug 18-19","effective_date":"2026-08-18","impact_areas":["congestion","airspace_closure","fuel_availability"],"routes_affected":["9P515 DXB-LHE","9P740 ISB-SHJ","9P700 ISB-JED","9P670 KHI-ISB","9P580 LHE-RUH"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"ATC","description":"Elevated India-Pakistan bilateral airspace tension (precedent: the reciprocal closures of May 2025, which pushed hundreds of daily flights onto Oman/UAE/Arabian Sea corridors for weeks) has ATC flow-managing traffic onto the same alternate corridors used by our SHJ-Pakistan network. Expect ATFM slot delays 20-45min and higher enroute holding fuel burn on DXB-LHE, ISB-SHJ, ISB-JED, KHI-ISB and LHE-RUH sectors. Dispatch to add contingency fuel and monitor for further FIR restriction NOTAMs.","source":"Extrapolated","caseStage":"Acknowledged","predictiveCountdown":{"deadline":"2026-08-18T14:20:00Z","sector":"9P515 DXB-LHE","consequence":"projected to land below reserve fuel if the flight plan isn't re-filed before this time"},"auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+  {"id":"p26","title":"USD fuel payment restriction — ALY station requires prepayment or tankering from CAI","effective_date":"2026-08-18","impact_areas":["fuel_availability","tankering"],"routes_affected":["E5321 ALY-JED (SU-AAE)","E5322 JED-ALY (SU-AAE)"],"priority":"High","risk_level":"Amber","status":"Active","trigger":"Fuel Supplier","description":"Local fuel supplier at Alexandria (ALY) has suspended open-account billing citing USD liquidity constraints (a recurring pattern seen across Egypt/Pakistan/Nigeria in recent years, occasionally forcing foreign carriers to suspend routes entirely). Treasury has arranged prepayment for Aug 18-20 but confirmation is pending; if unresolved by Aug 17 EOD, tanker fuel from Cairo for the ALY-JED-ALY rotation, reviewing payload impact on SU-AAE.","source":"Manual","caseStage":"InProgress","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Fuel Supplier. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}]},
+  {"id":"p27","title":"Ground handling shortfall — FEZ/TNG stations reporting ramp delays Aug 17-18","effective_date":"2026-08-17","impact_areas":["turnaround","airport_slots"],"routes_affected":["3O337 FEZ-MPL","3O338 MPL-FEZ","3O303 TNG-BOD","3O304 BOD-TNG"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"ATC","description":"Contracted ground handler at FEZ and TNG reports ramp staff shortage affecting turnaround times on the Morocco-France rotations; average turnaround now running 15-20min over block. Station manager to confirm minimum-crew coverage for the Aug 17-18 bank or accept knock-on retiming risk into the France ATC action window (see linked alert).","source":"Manual","caseStage":"InProgress","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via ATC. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}]},
+  {"id":"p28","title":"Brake/tyre thermal limit — high-frequency SHJ short-haul rotations in peak heat Aug 17","effective_date":"2026-08-17","impact_areas":["turnaround","performance_penalty"],"routes_affected":["G9027 SHJ-DOH","G9149 SHJ-JED","G91941 SHJ-AMM"],"priority":"Low","risk_level":"Green","status":"Active","trigger":"Weather","description":"Surface temperatures at SHJ exceeding 45°C during the 13:00-17:00Z peak bank are pushing brake temperatures close to the AFM cooling-schedule limit on quick-turn rotations under 45min ground time. No restriction yet, but ground ops to monitor brake temp indication and be prepared to extend turnaround by 10-15min for the 3 tightest-turn rotations rather than dispatch against a hot-brake caution.","source":"Schedule-Derived","caseStage":"Acknowledged","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Weather. Cross-checked against network exposure — flagged Green."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}]},
+  {"id":"p29","title":"Cabin oxygen generator AD — fleet compliance check due before Aug 20","effective_date":"2026-08-19","impact_areas":["compliance","mel_restriction"],"routes_affected":["Fleet-wide — chemical oxygen generator batch check"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Maintenance","description":"OEM service bulletin (elevated to mandatory AD by the state of design) requires inspection of a specific chemical-oxygen-generator batch installed across part of the narrowbody fleet, with compliance deadline Aug 20. Maintenance planning to cross-reference tails against the affected batch number and prioritize inspection ahead of Aug 19 rotations; any non-compliant tail found is not releasable until inspection is closed.","source":"Manual","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Maintenance. Cross-checked against network exposure — flagged Amber."}]},
+
+  // ── ROUND 3 ──
+  {"id":"p30","title":"Beirut security escalation — G9387/G9388/3L452/3L453 review-basis suspension risk Aug 18","effective_date":"2026-08-18","impact_areas":["airspace_closure","crew_constraints"],"routes_affected":["G9387 SHJ-BEY (A6-ANP)","G9388 BEY-SHJ (A6-ANP)","3L452 AUH-BEY (A6-AUJ)","3L453 BEY-AUH (A6-AUJ)"],"priority":"Critical","risk_level":"Red","status":"Active","trigger":"Security","description":"Escalating security reporting around Beirut raises the same rolling-suspension risk that led Gulf carriers to cancel Beirut services on short notice in past regional flare-ups. Security to issue a go/no-go decision for the Aug 18 SHJ-BEY and AUH-BEY rotations by 06:00Z; if suspended, both A6-ANP and A6-AUJ need same-day repositioning cover elsewhere in the network and crew/hotel logistics at BEY need immediate review for any layover already in progress.","source":"Manual","precedent":"Air Arabia cancelled Sharjah/Abu Dhabi–Beirut flights on Sep 24, 2024 during the Israel-Hezbollah escalation on a rolling short-notice review basis; Emirates, Etihad and Qatar Airways took equivalent action on Beirut, Baghdad, Basra, Tehran and Amman in the same window.","caseStage":"New","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Security. Cross-checked against network exposure — flagged Red."}]},
+  {"id":"p31","title":"Sudan (KRT) route reinstatement review — phased-reopening risk assessment","effective_date":"2026-08-19","impact_areas":["airspace_closure","congestion"],"routes_affected":["Network Planning — SHJ-KRT not currently scheduled"],"priority":"Medium","risk_level":"Amber","status":"Active","trigger":"Security","description":"Commercial has flagged potential reinstatement of SHJ-KRT once Sudanese airspace/Khartoum airport fully normalizes. Current schedule (this 72-hr file) correctly carries no KRT rotation, consistent with the ongoing conflict-risk posture. Before any reinstatement: confirm current HSSS FIR NOTAM status, verify Port Sudan/Egypt/Saudi contingency routing is still current, and treat any 'reopened' status as phased/cautious rather than a full return to normal ops.","source":"Manual","precedent":"Sudan's Khartoum airspace has been closed to civil traffic since Apr 2023; even after partial reopening steps, an Il-76 was reportedly shot down near Babanusa in Nov 2025 — operators continue to treat any reopening announcement as phased, not final.","caseStage":"Resolved","auditLog":[{"t": "D-1, 07:40Z", "a": "Agent", "x": "Detected via Security. Cross-checked against network exposure — flagged Amber."}, {"t": "D-1, 08:15Z", "a": "You", "x": "Acknowledged — reviewing with the relevant desk."}, {"t": "D-1, 09:30Z", "a": "You", "x": "Coordinating response with stakeholders; action in progress."}, {"t": "D-1, 13:00Z", "a": "Agent", "x": "Confirmed action taken. Marking resolved — will re-open automatically if conditions change."}]}
+];
+
+const CONTACTS = [
+  {"name":"Sarah Mitchell","role":"MCC Controller","email":"s.mitchell@airarabia.ae","phone":"+971500000001","notify_email":true,"notify_whatsapp":true},
+  {"name":"James Park","role":"Ops Controller","email":"j.park@airarabia.ae","phone":"+971500000002","notify_email":true,"notify_whatsapp":true},
+  {"name":"Elena Torres","role":"Flight Ops Manager","email":"e.torres@airarabia.ae","phone":"+971500000003","notify_email":true,"notify_whatsapp":true},
+  {"name":"Aftab Khan","role":"Crew Scheduling","email":"a.khan@airarabia.ae","phone":"+971500000004","notify_email":true,"notify_whatsapp":false},
+  {"name":"Raj Singh","role":"Maintenance Planner","email":"r.singh@airarabia.ae","phone":"+971500000005","notify_email":true,"notify_whatsapp":true},
+  {"name":"Omar Farouk","role":"Dispatcher","email":"o.farouk@airarabia.ae","phone":"+971500000006","notify_email":true,"notify_whatsapp":true}
+];
+
+const NOTIFICATIONS = [
+  {"date":"2026-08-15","plan":"Yemen airspace closure","risk":"Red","priority":"Critical","contacts":"Sarah Mitchell, James Park, Elena Torres, Omar Farouk","status":"Sent"},
+  {"date":"2026-08-15","plan":"Iran FIR military exercise","risk":"Amber","priority":"High","contacts":"Sarah Mitchell, James Park, Omar Farouk","status":"Sent"},
+  {"date":"2026-08-15","plan":"MEL restriction A6-EDO","risk":"Amber","priority":"High","contacts":"Raj Singh, James Park, Elena Torres, Aftab Khan","status":"Acknowledged"},
+  {"date":"2026-08-15","plan":"A6-EER C-check gap","risk":"Amber","priority":"High","contacts":"Aftab Khan, James Park","status":"Pending"},
+  {"date":"2026-08-15","plan":"Dense fog forecast SHJ","risk":"Amber","priority":"High","contacts":"Sarah Mitchell, James Park, Elena Torres","status":"Pending"},
+  {"date":"2026-08-15","plan":"Sandstorm warning DXB/SHJ","risk":"Amber","priority":"Medium","contacts":"Sarah Mitchell, James Park","status":"Pending"},
+  {"date":"2026-08-15","plan":"KRT fuel unavailability","risk":"Amber","priority":"High","contacts":"Omar Farouk, James Park","status":"Pending"},
+  {"date":"2026-08-15","plan":"Crew FTL 900hr limit","risk":"Amber","priority":"Medium","contacts":"Aftab Khan, James Park","status":"Pending"},
+  {"date":"2026-08-15","plan":"Sudan FIR permit expiry","risk":"Red","priority":"Critical","contacts":"Sarah Mitchell, James Park, Elena Torres, Omar Farouk","status":"Escalated"},
+  {"date":"2026-08-15","plan":"MCT runway maintenance","risk":"Amber","priority":"Medium","contacts":"James Park, Omar Farouk","status":"Acknowledged"},
+  {"date":"2026-08-15","plan":"BKK security advisory","risk":"Amber","priority":"Medium","contacts":"Aftab Khan, James Park","status":"Pending"},
+  {"date":"2026-08-15","plan":"VVIP movement SHJ","risk":"Amber","priority":"High","contacts":"Sarah Mitchell, James Park, Elena Torres","status":"Actioned"},
+  {"date":"2026-08-15","plan":"Hajj extra sections","risk":"Amber","priority":"High","contacts":"Aftab Khan, James Park, Omar Farouk","status":"Pending"}
+];
+
+// ══ SCENARIO LIBRARY ══
+const SCENARIOS = [
+  {icon:"🚫",title:"Airspace Closure / NOTAM",desc:"FIR closures, military exercises, restricted waypoints, temporary segregated areas",triggers:["NOTAM","ATC","Flight Planning"],impacts:["Airspace","Fuel","Crew FTL"],pre:"Airspace closure over — rerouting required for sectors"},
+  {icon:"🔧",title:"MEL Restriction on Aircraft",desc:"Open MEL items limiting CAT II/III, RVSM, ETOPS, or specific destination operations",triggers:["Maintenance System","Tech Log"],impacts:["MEL","Crew","Sectors"],pre:"MEL restriction — ops limited for rotations"},
+  {icon:"🏭",title:"Aircraft Scheduled Maintenance",desc:"C-checks, A-checks, parking, or fleet utilization gaps affecting coverage",triggers:["Maintenance Plan","Fleet Util"],impacts:["Crew","Sectors","Coverage"],pre:"Aircraft scheduled for maintenance — fleet utilization gap"},
+  {icon:"🌦️",title:"Weather Advisory / Fog",desc:"Dense fog, sandstorms, thunderstorms, extreme temps, low-vis operations",triggers:["METAR/TAF","SIGMET","ACC Forecast"],impacts:["Weather","Slots","Fuel","Crew"],pre:"Weather advisory — forecast impacts at"},
+  {icon:"🛢️",title:"Fuel Availability Issue",desc:"Refueller strike, refinery maintenance, fuel contamination at tech-stop or destination",triggers:["Fuel Supplier","Dispatch Report"],impacts:["Fuel","Tankering","Payload"],pre:"Fuel availability issue — tankering required for"},
+  {icon:"👤",title:"Crew FTL / Duty Time Risk",desc:"Pilots approaching 900hr annual limit, FTL duty extensions, standby exhaustion",triggers:["Crew Roster System","FTL Monitor"],impacts:["Crew","Rostering"],pre:"Crew FTL risk — pilots approaching annual limit"},
+  {icon:"📜",title:"Overflight / Landing Permit Expiry",desc:"Bilateral permits, overflight clearances, seasonal permits expiring without renewal",triggers:["Permit Tracker","External Affairs"],impacts:["Airspace","Sectors","Diplomacy"],pre:"Overflight permit expiry — FIR transit affected"},
+  {icon:"⏰",title:"Watch Hours / Curfew Extension",desc:"Military watch hours, airport curfews, noise abatement restrictions extended",triggers:["ATC","Airport NOTAM"],impacts:["Slots","Timing","Crew"],pre:"Watch hours extended — night ops affected at"},
+  {icon:"🎟️",title:"Airport Slot Constraints",desc:"Runway maintenance, taxiway closures, slot retiming, capacity reductions",triggers:["Slot Coordinator","Airport Ops"],impacts:["Slots","Timing","Sectors"],pre:"Airport slot constraints — runway maintenance at"},
+  {icon:"🛑",title:"Runway Closure",desc:"Planned runway maintenance, VVIP movements, rubber removal, lighting repairs",triggers:["ATC","Airport Ops"],impacts:["Runway","Slots","Sectors"],pre:"Runway closure — VVIP movement / maintenance at"},
+  {icon:"⛽",title:"Tankering Requirement",desc:"Destination fuel unavailable, quality issues, or pricing differentials requiring uplift",triggers:["Fuel Supplier","Dispatch"],impacts:["Tankering","Payload","MTOW"],pre:"Tankering required — fuel unavailability at"},
+  {icon:"🔐",title:"Security Advisory",desc:"Political gatherings, civil unrest, embassy warnings affecting crew layovers",triggers:["Security Dept","Embassy Advisory"],impacts:["Crew","Ground Ops","Layovers"],pre:"Security advisory — political gathering at"},
+  {icon:"🕋",title:"Seasonal Extra Sections",desc:"Hajj/Umrah, summer/winter schedule, charters, repatriation, sporting events",triggers:["Schedule Change","Commercial"],impacts:["Crew","Slots","Fuel","Fleet"],pre:"Seasonal extra sections — additional flights scheduled"},
+  {icon:"📡",title:"Nav Database Update",desc:"AIRAC cycle update, procedure changes, new waypoints requiring crew briefing",triggers:["Nav Database","Flight Ops"],impacts:["Crew","Procedures"],pre:"Nav database update — AIRAC cycle change affecting"},
+  {icon:"✈️",title:"Aircraft Repositioning",desc:"Ferry flights, aircraft swaps, AOG recovery, base transfers disrupting coverage",triggers:["Maintenance","Fleet Planning"],impacts:["Coverage","Crew","Slots"],pre:"Aircraft repositioning — ferry/swap disrupting coverage"},
+  {icon:"🧊",title:"De-Icing / Winter Ops",desc:"Contaminated runways, de-icing fluid availability, holdover time implications",triggers:["Weather","Ground Ops"],impacts:["Weather","Slots","Ground Ops"],pre:"Winter ops — de-icing requirements at"},
+  {icon:"🚨",title:"AOG / Unplanned Grounding",desc:"Unexpected technical faults requiring grounding, parts not available at outstation",triggers:["Tech Log","Maintenance Control"],impacts:["Coverage","Crew","Sectors"],pre:"AOG — unplanned grounding of aircraft"},
+  {icon:"🌍",title:"Volcanic Ash / SIGMET",desc:"Volcanic activity, ash clouds, contamination routes requiring avoidance",triggers:["VAAC","SIGMET"],impacts:["Airspace","Fuel","Weather"],pre:"Volcanic ash advisory — airspace contamination near"},
+  {icon:"📦",title:"Cargo Special Loads",desc:"Dangerous goods restrictions, oversized cargo, animals, or DG route limitations",triggers:["Cargo Ops","Load Control"],impacts:["Payload","Sectors","Weight"],pre:"Cargo special load — restrictions on sector"},
+  {icon:"🛂",title:"Crew Visa / Documentation",desc:"Crew visa expiry, new destination visa requirements, documentation gaps",triggers:["Crew Services","Immigration"],impacts:["Crew","Sectors"],pre:"Crew visa/documentation — expiry or requirement for"},
+
+  // ── NEW SCENARIO CATEGORIES ──
+  {icon:"🌊",title:"ETOPS Alternate Degradation",desc:"Enroute diversion airport closed/degraded on overwater ETOPS-120/180 sectors, reduced diversion coverage",triggers:["NOTAM","Flight Planning","ETOPS Tracker"],impacts:["ETOPS","Fuel","Airspace"],pre:"ETOPS alternate degraded — reduced diversion coverage on"},
+  {icon:"📡",title:"ETOPS Tail Currency / Certification",desc:"Aircraft-specific ETOPS airworthiness recheck due, reliability package lapse, tail swap needed before overwater dispatch",triggers:["Maintenance System","ETOPS Tracker"],impacts:["ETOPS","MEL","Sectors"],pre:"ETOPS currency check due — tail approaching recheck window"},
+  {icon:"⏱️",title:"FDP Extension / Commander's Discretion",desc:"Flight duty period at risk of exceeding limit due to delay, requiring discretion report or standby crew cover",triggers:["Crew Roster System","FTL Monitor"],impacts:["Crew","FDP","Rostering"],pre:"FDP extension risk — late departure impacts return crew duty"},
+  {icon:"🛏️",title:"Reduced Crew Rest / Layover Disruption",desc:"Hotel overbooking, facility issues, or noise/construction at layover station threatening WOCL-compliant rest",triggers:["Crew Services","Hotel Ops"],impacts:["Crew","FDP","Rostering"],pre:"Layover disruption — crew rest facility compromised at"},
+  {icon:"📶",title:"GPS Jamming / Nav Interference",desc:"GNSS spoofing/jamming in conflict-adjacent FIRs degrading RNAV approaches, requiring conventional nav backup",triggers:["ATC","GNSS Monitor","Flight Planning"],impacts:["Airspace","Navigation","Approach"],pre:"GPS jamming advisory — RNAV approaches degraded in"},
+  {icon:"🌡️",title:"Hot & High Performance Penalty",desc:"Extreme surface temperature or high-elevation airport reducing max takeoff weight, forcing payload/fuel restriction",triggers:["Weather","Performance Engineering"],impacts:["Weather","Payload","Fuel"],pre:"Extreme heat performance penalty — payload restricted at"},
+  {icon:"✊",title:"ATC / Ground Industrial Action",desc:"Air traffic control or ground handling strikes forcing minimum-service schedules, mandatory pre-notification filings",triggers:["ATC","Union Notice","Airport Authority"],impacts:["Slots","Sectors","Timing"],pre:"Industrial action — minimum service schedule affecting"},
+  {icon:"💻",title:"Flight Planning / Dispatch System Outage",desc:"EFB, NOTAM feed, weight & balance, or flight-planning software outage requiring manual dispatch contingency",triggers:["IT Systems","Dispatch"],impacts:["Dispatch","Crew","Network-wide"],pre:"Systems outage — manual dispatch contingency activated for"},
+  {icon:"🦅",title:"Wildlife Hazard / Bird Strike NOTAM",desc:"Elevated bird activity or wildlife hazard NOTAM near runway threshold during peak departure/arrival banks",triggers:["Airport NOTAM","Ground Ops"],impacts:["Runway","Slots","Safety"],pre:"Bird activity NOTAM — increased strike risk during"},
+  {icon:"🤝",title:"Diplomatic / State Overflight Clearance",desc:"Bilateral diplomatic clearance renewal pending for sensitive FIRs, distinct from routine commercial overflight permits",triggers:["External Affairs","Diplomatic Channel"],impacts:["Airspace","Diplomacy","Sectors"],pre:"Diplomatic overflight clearance pending — renewal required for"},
+  {icon:"🆕",title:"New Destination / First-Flight Route Validation",desc:"Inaugural service to a new airport requiring chart validation, performance data, and crew route qualification",triggers:["Flight Ops","Commercial Planning"],impacts:["Procedures","Crew","Charts"],pre:"New destination validation — inaugural flight to"},
+  {icon:"🏥",title:"Medical Diversion Contingency",desc:"Pre-flight briefing on enroute medical diversion airports and hospital capability for long/overwater sectors",triggers:["Flight Ops","Medical Advisory"],impacts:["Safety","ETOPS","Routing"],pre:"Medical diversion contingency — enroute hospital review for"},
+
+  // ── ROUND 2: precedent-grounded scenarios from 100+ aircraft operators facing comparable exposure ──
+  {icon:"🛩️",title:"Engine Manufacturer AD / Fleet Grounding",desc:"Manufacturer airworthiness directive (e.g. powder-metal / durability defect) forcing multi-aircraft grounding for extended shop-visit inspection",triggers:["Maintenance System","OEM Bulletin"],impacts:["Fleet","MEL","Coverage"],pre:"Engine AD grounding — aircraft removed from rotation pending inspection",precedent:"Wizz Air grounded up to ~60 of its ~240 A320neo-family aircraft (2023–2025) after a Pratt & Whitney PW1100G GTF powder-metal contamination AD, with shop-visit turnarounds of ~300 days per engine."},
+  {icon:"🗺️",title:"State-to-State Airspace Denial",desc:"Bilateral political/military tension closes one country's airspace to another's carriers or to all traffic, forcing network-wide reroute and congestion on remaining corridors",triggers:["NOTAM","Diplomatic Channel","ATC"],impacts:["Airspace","Fuel","Congestion"],pre:"State-to-state airspace denial — bilateral restriction affecting",precedent:"India and Pakistan closed reciprocal airspace in May 2025; Gulf carriers and third-country traffic were forced onto already-congested corridors over Oman, the UAE and the Arabian Sea for the duration."},
+  {icon:"💱",title:"FX / Fuel Payment Restriction at Outstation",desc:"Foreign-exchange shortage or central-bank restriction prevents local fuel supplier from accepting payment, forcing pre-payment or tankering",triggers:["Fuel Supplier","Finance/Treasury"],impacts:["Fuel","Tankering","Payload"],pre:"FX/fuel payment restriction — tankering required to cover",precedent:"USD liquidity shortages at several outstations (Nigeria 2022-23, Pakistan, Egypt) have forced international carriers into prepaid or tankered fuel arrangements, in some cases suspending routes entirely."},
+  {icon:"🧰",title:"Ground Handling Agent Service Failure",desc:"Contracted ground/ramp handler at an outstation understaffed, insolvent, or under-equipped, risking turnaround delays or missed slot times",triggers:["Ground Ops","Station Manager"],impacts:["Slots","Timing","Turnaround"],pre:"Ground handling service failure — turnaround risk at",precedent:"Handler staffing and equipment shortfalls at secondary outstations are a recurring cause of knock-on network delay for LCCs operating thin, high-frequency short-haul networks."},
+  {icon:"🛡️",title:"Cabin Safety Equipment AD / Recall",desc:"Manufacturer recall or AD on oxygen generators, escape slides, or life vests requiring fleet-wide check before further dispatch",triggers:["Maintenance System","OEM Bulletin"],impacts:["MEL","Fleet","Compliance"],pre:"Cabin safety equipment AD — fleet check required before dispatch",precedent:"Periodic OEM recalls on chemical oxygen generators and evacuation slides have required fleet-wide compliance checks across single-aisle operators within tight AD deadlines."},
+  {icon:"🛞",title:"Rapid-Turnaround Brake/Tyre Thermal Limit",desc:"High-frequency short-haul rotations in extreme heat push brake temperatures near limits, forcing extended turnaround or cooling delay",triggers:["Weather","Ground Ops","Tech Log"],impacts:["Turnaround","Weather","Timing"],pre:"Brake/tyre thermal limit — extended turnaround required at"},
+  {icon:"🎫",title:"Charter / Ad-hoc VVIP Aircraft Pull",desc:"Commercial charter or VVIP tasking pulls a scheduled aircraft from the line, requiring a swap or gap in regular rotation coverage",triggers:["Commercial","Fleet Planning"],impacts:["Coverage","Sectors","Fleet"],pre:"Charter aircraft pull — scheduled rotation gap created by"},
+  {icon:"🌐",title:"Third-Country Overflight Congestion",desc:"Traffic diverted around a closed FIR concentrates onto neighbouring corridors, causing ATC-imposed flow restrictions and delay even for unaffected carriers",triggers:["ATC","Flight Planning"],impacts:["Airspace","Congestion","Timing"],pre:"Overflight congestion — flow restriction on alternate corridor via"},
+
+  // ── ROUND 3: precedent directly involving Air Arabia / comparable Gulf carriers ──
+  {icon:"⚔️",title:"Conflict Zone Route Suspension",desc:"Escalating regional conflict forces outright suspension of a destination (not just rerouting), with rolling review dates and no fixed resumption",triggers:["Security Dept","Diplomatic Channel","ATC"],impacts:["Airspace","Sectors","Coverage"],pre:"Conflict zone route suspension — services to","precedent":"Air Arabia itself cancelled Sharjah/Abu Dhabi–Beirut flights on Sep 24, 2024 during the Israel-Hezbollah escalation, alongside Emirates, Etihad, Qatar Airways and flydubai suspending Beirut, Baghdad, Basra, Tehran and Amman services on rolling short-notice review dates."},
+  {icon:"🔄",title:"War-Risk Airspace Phased Reopening",desc:"A previously closed conflict-zone airspace/airport nominally reopens, but residual military risk means a cautious phased return rather than a full resumption",triggers:["NOTAM","Security Dept","ATC"],impacts:["Airspace","Sectors","Safety"],pre:"Phased reopening — cautious return to previously closed airspace at","precedent":"Sudan's HSSK/Khartoum airspace was closed to civil traffic from Apr 2023; even as sectors have reopened in stages, an Il-76 was reportedly shot down near Babanusa in Nov 2025 — the pattern operators watch for before resuming any 'reopened' war-risk airspace."}
+];
+
+// ══ META ══
+const IMPACT_META = {
+  airspace_closure:{label:"Airspace Closure",icon:"🚫",weight:10},
+  watch_hours:{label:"Watch Hours",icon:"⏰",weight:5},
+  mel_restriction:{label:"MEL Restriction",icon:"🔧",weight:8},
+  tankering:{label:"Tankering",icon:"⛽",weight:4},
+  fuel_availability:{label:"Fuel Availability",icon:"🛢️",weight:7},
+  crew_constraints:{label:"Crew Constraints",icon:"👤",weight:5},
+  runway_closure:{label:"Runway Closure",icon:"🛑",weight:9},
+  airport_slots:{label:"Airport Slots",icon:"🎟️",weight:4},
+  weather:{label:"Weather",icon:"🌦️",weight:6},
+  etops_alternate:{label:"ETOPS Alternate",icon:"🌊",weight:9},
+  fdp_extension:{label:"FDP Extension",icon:"⏱️",weight:7},
+  gps_interference:{label:"GPS Interference",icon:"📶",weight:8},
+  performance_penalty:{label:"Performance Penalty",icon:"🌡️",weight:6},
+  industrial_action:{label:"Industrial Action",icon:"✊",weight:7},
+  cyber_system:{label:"Systems Outage",icon:"💻",weight:6},
+  fleet:{label:"Fleet Grounding",icon:"🛩️",weight:9},
+  congestion:{label:"Overflight Congestion",icon:"🌐",weight:5},
+  turnaround:{label:"Turnaround Constraint",icon:"🛞",weight:4},
+  compliance:{label:"Compliance / AD",icon:"🛡️",weight:8}
+};
+const STAKEHOLDER_MAP = {
+  airspace_closure:["MCC Controller","Ops Controller","Flight Ops Manager","Dispatcher"],
+  watch_hours:["Ops Controller","Dispatcher"],
+  mel_restriction:["Maintenance Planner","Ops Controller","Flight Ops Manager"],
+  tankering:["Dispatcher","Ops Controller"],
+  fuel_availability:["Dispatcher","Ops Controller"],
+  crew_constraints:["Crew Scheduling","Ops Controller"],
+  runway_closure:["MCC Controller","Ops Controller","Flight Ops Manager"],
+  airport_slots:["Ops Controller","Dispatcher"],
+  weather:["MCC Controller","Ops Controller","Dispatcher"],
+  etops_alternate:["Dispatcher","Flight Ops Manager","MCC Controller"],
+  fdp_extension:["Crew Scheduling","Ops Controller"],
+  gps_interference:["Dispatcher","MCC Controller","Flight Ops Manager"],
+  performance_penalty:["Dispatcher","Load Control"],
+  industrial_action:["Ops Controller","Flight Ops Manager","Dispatcher"],
+  cyber_system:["Dispatcher","Ops Controller","Flight Ops Manager"],
+  fleet:["Maintenance Planner","Flight Ops Manager","Ops Controller"],
+  congestion:["Dispatcher","Ops Controller"],
+  turnaround:["Ops Controller","Dispatcher"],
+  compliance:["Maintenance Planner","Flight Ops Manager"]
+};
+const RISK_COLORS={Red:"#f87171",Amber:"#fbbf24",Green:"#34d399"};
+const TODAY=new Date();
+
+// ══ REAL NETWORK EXPOSURE (derived from the uploaded 16 Aug 2026 72-hr schedule: 454 flights / 96 tails / 98 stations) ══
+const NETWORK_STATS={
+  source_note:"Derived from your uploaded 72-hr schedule (originally captured 16 Aug 2026 · 454 flights · 96 tails · 98 stations). Today is 17 Aug — this panel treats that schedule as representative of the rolling Aug 17–19 window; Aug 18-19 figures are same-rotation extrapolations pending your D+1/D+2 schedule files.",
+  cells:[
+    {n:47,label:"ETOPS-relevant overwater sectors (BKK/KUL/HKT/CGP/DAC/MLE/KTM/CMB)",filter:"etops_alternate"},
+    {n:76,label:"Pakistan network sectors (ISB/LHE/KHI/PEW/SKT/UET) — airspace-tension exposed",filter:"congestion"},
+    {n:56,label:"Hot & high KSA sectors (JED/RUH/MED/DMM/TIF/TUU/AHB) — Aug heat performance risk",filter:"performance_penalty"},
+    {n:24,label:"Levant/Iraq conflict-adjacent FIR sectors (BGW/EBL/ALP/AMM/BEY/BSR) — GNSS interference zone",filter:"gps_interference"},
+    {n:14,label:"France sectors (CDG/LYS/BOD/MPL) — ATC industrial action exposed",filter:"industrial_action"},
+    {n:96,label:"Unique tails in 72-hr plan — any AD grounding removes coverage network-wide",filter:"fleet"}
+  ]
+};
+function buildExposurePanel(){
+  document.getElementById('exposure-panel').innerHTML=`
+    <div class="exposure-hdr">
+      <div><div class="exposure-title">📊 72-Hour Network Exposure — from your schedule upload</div><div class="exposure-sub">${NETWORK_STATS.source_note}</div></div>
+    </div>
+    <div class="exposure-grid">
+      ${NETWORK_STATS.cells.map(c=>`<div class="exposure-cell" onclick="filterAlerts('${c.filter}')"><div class="exposure-num">${c.n}</div><div class="exposure-lbl">${c.label}</div></div>`).join('')}
+    </div>`;
+}
+
+// ══ CARRIER / AOC MAPPING ══
+const CARRIER_MAP={G9:"Air Arabia (SHJ)",'3L':"Air Arabia AUH",E5:"Air Arabia Egypt",'9P':"Fly Jinnah (PK)",'3O':"Air Arabia Maroc",'4P':"Codeshare/Other"};
+function carriersForPlan(p){
+  const set=new Set();
+  (p.routes_affected||[]).forEach(r=>{
+    const m=r.match(/^([A-Z0-9]{2})\d/);
+    if(m&&CARRIER_MAP[m[1]])set.add(m[1]);
+  });
+  return[...set];
+}
+
+// ══ HELPERS ══
+function daysUntil(s){return Math.round((new Date(s)-TODAY)/86400000)}
+function hoursUntil(s){return Math.round((new Date(s)-TODAY)/3600000)}
+function countdownLabel(d){
+  if(d<0)return{text:Math.abs(d)+'d overdue',cls:'urgent'};
+  if(d===0)return{text:'TODAY',cls:'urgent'};
+  if(d===1)return{text:'TOMORROW',cls:'soon'};
+  if(d<=3)return{text:d+' DAYS OUT',cls:'soon'};
+  return{text:d+' DAYS OUT',cls:'normal'};
+}
+function slaLabel(p){
+  const h=hoursUntil(p.effective_date);
+  const isUrgent=p.risk_level==='Red'||p.priority==='Critical';
+  if(!isUrgent)return null;
+  if(h<0)return{text:Math.abs(h)+'h OVERDUE',cls:'urgent'};
+  if(h<=24)return{text:h+'h TO ACT',cls:'urgent'};
+  if(h<=72)return{text:Math.round(h/24)+'d ('+h+'h) TO ACT',cls:'soon'};
+  return null;
+}
+function getActions(impacts){
+  const a=[];
+  if(impacts.includes('airspace_closure')){a.push('Review NOTAM & coordinate rerouting with dispatch','Calculate extra fuel burn & notify fueling')}
+  if(impacts.includes('mel_restriction')){a.push('Coordinate with maintenance for rectification timeline','Assess aircraft swap feasibility for affected rotations')}
+  if(impacts.includes('watch_hours')){a.push('Adjust departure slots to avoid watch hour windows','Notify crew scheduling of potential delays')}
+  if(impacts.includes('tankering')||impacts.includes('fuel_availability')){a.push('File fuel plan with tankering uplift from departure station','Recalculate payload limitations & notify load control')}
+  if(impacts.includes('crew_constraints')){a.push('Review FTL implications for affected sectors','Coordinate crew swap if duty time affected')}
+  if(impacts.includes('runway_closure')){a.push('Suspend operations during closure window','Coordinate departure sequencing with ATC')}
+  if(impacts.includes('airport_slots')){a.push('Liaise with slot coordinator for revised times','Brief OCC on revised departure plan')}
+  if(impacts.includes('weather')){a.push('Monitor METAR/TAF updates every 30min','Prepare contingency for diversions','Ensure CAT II/III aircraft on stand')}
+  if(impacts.includes('etops_alternate')){a.push('Re-verify ETOPS entry/exit points & enroute alternate coverage','Re-file computerized flight plan with revised diversion airport')}
+  if(impacts.includes('fdp_extension')){a.push('Check commander discretion criteria against projected FDP','Pre-position standby crew if discretion cannot be exercised')}
+  if(impacts.includes('gps_interference')){a.push('Brief crew on conventional (ILS/VOR) approach backup','Check RAIM prediction & file non-RNAV-capable alternate')}
+  if(impacts.includes('performance_penalty')){a.push('Run temperature-corrected performance for affected sectors','Flag payload/cargo offload requirement to load control 3h before STD')}
+  if(impacts.includes('industrial_action')){a.push('File mandatory pre-notification with airport/ATC authority','Confirm cancellation/consolidation plan with commercial & notify pax')}
+  if(impacts.includes('cyber_system')){a.push('Activate manual dispatch contingency (paper W&B, backup NOTAM pack)','Prioritize Critical/Red sectors for manual verification first')}
+  if(impacts.includes('fleet')){a.push('Confirm OEM inspection/shop-visit schedule per affected tail','Re-plan fleet utilization & identify wet-lease or swap coverage gap')}
+  if(impacts.includes('congestion')){a.push('File revised flight plan via alternate corridor & confirm ATC flow slot','Add contingency fuel for enroute holding/rerouting')}
+  if(impacts.includes('turnaround')){a.push('Extend scheduled turnaround time & notify downstream rotation','Monitor brake temperature / request extended cooling before next departure')}
+  if(impacts.includes('compliance')){a.push('Confirm AD/recall compliance status per tail before release','Coordinate parts availability with maintenance planning')}
+  if(!a.length)a.push('Monitor situation & brief OCC on next shift handover');
+  return a;
+}
+function getStakeholders(impacts){return[...new Set(impacts.flatMap(a=>STAKEHOLDER_MAP[a]||[]))]}
+function calcRisk(impacts,sectors){
+  const w=impacts.reduce((s,a)=>s+(IMPACT_META[a]?.weight||3),0);
+  if(w>=20||(w>=15&&sectors>=3))return'Red';
+  if(w>=10||sectors>=2)return'Amber';
+  return'Green';
+}
+function triggerClass(t){return t==='Manual'?'trigger-manual':['NOTAM','Schedule','Maintenance','Weather','Crew System','Permit Expiry','Fuel Supplier','ATC','Security'].includes(t)?'trigger-auto':'trigger-watch'}
+
+// ══ NAV ══
+function showView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v)?.classList.add('active');
+  document.getElementById('nav-'+v)?.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ══ DATE ══
+document.getElementById('today-chip').textContent=TODAY.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+
+// ══ HERO ══
+function buildHero(){
+  const active=PLANS.filter(p=>p.status==='Active');
+  const red=active.filter(p=>p.risk_level==='Red').length;
+  const amber=active.filter(p=>p.risk_level==='Amber').length;
+  const totalSectors=active.reduce((s,p)=>s+(p.routes_affected?.length||0),0);
+  const triggers=[...new Set(active.map(p=>p.trigger||'Manual'))].length;
+  const score=Math.min(100,Math.round((red*30+amber*12)/(active.length||1)));
+  const riskColor=score>=50?'#f87171':score>=25?'#fbbf24':score>0?'#34d399':'#475569';
+  const riskLabel=score>=50?'HIGH RISK':score>=25?'ELEVATED':score>0?'MONITOR':'ALL CLEAR';
+  const circ=2*Math.PI*30;
+  const off=score?circ*(1-score/100):circ;
+  
+  document.getElementById('hero-banner').innerHTML=`
+    <div class="hero-info">
+      <div class="hero-status">
+        <span style="font-size:18px;color:${riskColor}">${riskLabel}</span>
+        ${red?`<span class="pill pill-red">${red} RED</span>`:''}
+        ${amber?`<span class="pill pill-amber">${amber} AMBER</span>`:''}
+        ${!red&&!amber?`<span class="pill pill-green">ALL CLEAR</span>`:''}
+      </div>
+      <div class="hero-sub">${active.length} active plans within 3-day horizon · ${triggers} trigger sources monitored · auto-scan daily at 04:00 UTC</div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="hero-stat-num">${totalSectors}</span> sectors affected</div>
+        <div class="hero-stat"><span class="hero-stat-num">${active.filter(p=>(p.impact_areas||[]).includes('airspace_closure')).length}</span> airspace alerts</div>
+        <div class="hero-stat"><span class="hero-stat-num">${active.filter(p=>(p.impact_areas||[]).includes('weather')).length}</span> weather alerts</div>
+        <div class="hero-stat"><span class="hero-stat-num">${active.filter(p=>(p.impact_areas||[]).includes('crew_constraints')).length}</span> crew alerts</div>
+      </div>
+    </div>
+    <div class="gauge">
+      <svg width="80" height="80"><circle class="gauge-bg" cx="40" cy="40" r="30"/><circle class="gauge-fill" cx="40" cy="40" r="30" stroke="${riskColor}" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/></svg>
+      <div class="gauge-val"><div class="gauge-num" style="color:${riskColor}">${score}</div><div class="gauge-lbl">Risk</div></div>
+    </div>`;
+}
+
+// ══ KPIs ══
+function buildKPIs(){
+  const a=PLANS.filter(p=>p.status==='Active');
+  const red=a.filter(p=>p.risk_level==='Red').length;
+  const amber=a.filter(p=>p.risk_level==='Amber').length;
+  const sectors=a.reduce((s,p)=>s+(p.routes_affected?.length||0),0);
+  const triggers=[...new Set(a.map(p=>p.trigger||'Manual'))];
+  document.getElementById('kpi-row').innerHTML=`
+    <div class="kpi red" onclick="filterAlerts('Red')"><div class="kpi-icon">🚨</div><div class="kpi-label">Red Alerts</div><div class="kpi-val" style="color:var(--red)">${red}</div><div class="kpi-sub">Critical — act now</div></div>
+    <div class="kpi amber" onclick="filterAlerts('Amber')"><div class="kpi-icon">⚠️</div><div class="kpi-label">Amber Warnings</div><div class="kpi-val" style="color:var(--amber)">${amber}</div><div class="kpi-sub">Plan required</div></div>
+    <div class="kpi accent"><div class="kpi-icon">🛫</div><div class="kpi-label">Sectors Hit</div><div class="kpi-val" style="color:var(--accent)">${sectors}</div><div class="kpi-sub">Across active plans</div></div>
+    <div class="kpi neutral"><div class="kpi-icon">📡</div><div class="kpi-label">Trigger Sources</div><div class="kpi-val">${triggers.length}</div><div class="kpi-sub">${triggers.join(', ').substring(0,40)}${triggers.join(', ').length>40?'…':''}</div></div>
+  `;
+}
+
+// ══ FILTER ══
+let currentFilter='All';
+function buildFilterBar(){
+  const cats=['Airspace','Weather','Crew','Fuel','Slots','Maintenance'];
+  const html=`
+    <span class="filter-group-label">Risk:</span>
+    <div class="filter-chip ${currentFilter==='All'?'active':''}" onclick="filterAlerts('All')">All (${PLANS.filter(p=>p.status==='Active').length})</div>
+    <div class="filter-chip ${currentFilter==='Red'?'active':''}" onclick="filterAlerts('Red')">🔴 Red</div>
+    <div class="filter-chip ${currentFilter==='Amber'?'active':''}" onclick="filterAlerts('Amber')">🟡 Amber</div>
+    <div class="filter-chip ${currentFilter==='Green'?'active':''}" onclick="filterAlerts('Green')">🟢 Green</div>
+    <span class="filter-sep">|</span>
+    <span class="filter-group-label">Priority:</span>
+    <div class="filter-chip ${currentFilter==='Critical'?'active':''}" onclick="filterAlerts('Critical')">Critical</div>
+    <div class="filter-chip ${currentFilter==='High'?'active':''}" onclick="filterAlerts('High')">High</div>
+    <div class="filter-chip ${currentFilter==='Medium'?'active':''}" onclick="filterAlerts('Medium')">Medium</div>
+    <span class="filter-sep">|</span>
+    <span class="filter-group-label">Impact:</span>
+    <div class="filter-chip ${currentFilter==='airspace_closure'?'active':''}" onclick="filterAlerts('airspace_closure')">🚫 Airspace</div>
+    <div class="filter-chip ${currentFilter==='weather'?'active':''}" onclick="filterAlerts('weather')">🌦️ Weather</div>
+    <div class="filter-chip ${currentFilter==='crew_constraints'?'active':''}" onclick="filterAlerts('crew_constraints')">👤 Crew</div>
+    <div class="filter-chip ${currentFilter==='mel_restriction'?'active':''}" onclick="filterAlerts('mel_restriction')">🔧 MEL</div>
+    <div class="filter-chip ${currentFilter==='fuel_availability'?'active':''}" onclick="filterAlerts('fuel_availability')">🛢️ Fuel</div>
+    <div class="filter-chip ${currentFilter==='runway_closure'?'active':''}" onclick="filterAlerts('runway_closure')">🛑 Runway</div>
+    <div class="filter-chip ${currentFilter==='etops_alternate'?'active':''}" onclick="filterAlerts('etops_alternate')">🌊 ETOPS</div>
+    <div class="filter-chip ${currentFilter==='fdp_extension'?'active':''}" onclick="filterAlerts('fdp_extension')">⏱️ FDP</div>
+    <div class="filter-chip ${currentFilter==='gps_interference'?'active':''}" onclick="filterAlerts('gps_interference')">📶 GPS</div>
+    <div class="filter-chip ${currentFilter==='performance_penalty'?'active':''}" onclick="filterAlerts('performance_penalty')">🌡️ Heat</div>
+    <div class="filter-chip ${currentFilter==='industrial_action'?'active':''}" onclick="filterAlerts('industrial_action')">✊ Strike</div>
+    <div class="filter-chip ${currentFilter==='cyber_system'?'active':''}" onclick="filterAlerts('cyber_system')">💻 Systems</div>
+    <div class="filter-chip ${currentFilter==='fleet'?'active':''}" onclick="filterAlerts('fleet')">🛩️ Fleet AD</div>
+    <span class="filter-sep">|</span>
+    <span class="filter-group-label">Fleet (AOC):</span>
+    <div class="filter-chip ${currentFilter==='carrier:G9'?'active':''}" onclick="filterAlerts('carrier:G9')">G9 Air Arabia</div>
+    <div class="filter-chip ${currentFilter==='carrier:3L'?'active':''}" onclick="filterAlerts('carrier:3L')">3L AUH</div>
+    <div class="filter-chip ${currentFilter==='carrier:E5'?'active':''}" onclick="filterAlerts('carrier:E5')">E5 Egypt</div>
+    <div class="filter-chip ${currentFilter==='carrier:9P'?'active':''}" onclick="filterAlerts('carrier:9P')">9P Fly Jinnah</div>
+    <div class="filter-chip ${currentFilter==='carrier:3O'?'active':''}" onclick="filterAlerts('carrier:3O')">3O Maroc</div>
+    <span class="filter-sep">|</span>
+    <span class="filter-group-label">Trigger:</span>
+    <div class="filter-chip ${currentFilter==='NOTAM'?'active':''}" onclick="filterAlerts('NOTAM')">NOTAM</div>
+    <div class="filter-chip ${currentFilter==='Weather'?'active':''}" onclick="filterAlerts('Weather')">Weather</div>
+    <div class="filter-chip ${currentFilter==='Maintenance'?'active':''}" onclick="filterAlerts('Maintenance')">Maintenance</div>
+    <div class="filter-chip ${currentFilter==='ATC'?'active':''}" onclick="filterAlerts('ATC')">ATC</div>
+    <div class="filter-chip ${currentFilter==='Security'?'active':''}" onclick="filterAlerts('Security')">Security</div>
+  `;
+  document.getElementById('filter-bar').innerHTML=html;
+  const fb2=document.getElementById('filter-bar-2');
+  if(fb2) fb2.innerHTML=html;
+}
+function filterAlerts(f){currentFilter=f;buildFilterBar();buildAlerts()}
+
+// ══ ALERT CARDS ══
+function timeToImpact(iso){
+  const diff = new Date(iso) - new Date();
+  if(diff<=0)return{text:'Deadline passed',urgent:true};
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  return{text:`${h}h ${m}m left`,urgent:h<3};
+}
+const STAGE_ORDER=['New','Acknowledged','InProgress','Resolved'];
+const STAGE_LABEL={New:'New',Acknowledged:'Acknowledged',InProgress:'In Progress',Resolved:'Resolved'};
+function advanceStage(id,btnEl){
+  const p=PLANS.find(x=>x.id===id);
+  if(!p)return;
+  const idx=STAGE_ORDER.indexOf(p.caseStage||'New');
+  if(idx>=STAGE_ORDER.length-1)return;
+  p.caseStage=STAGE_ORDER[idx+1];
+  if(!p.auditLog)p.auditLog=[];
+  p.auditLog.push({t:'now',a:'You',x:'Advanced to '+STAGE_LABEL[p.caseStage]+'.'});
+  buildAlerts();
+}
+function alertCardHTML(p){
+  const cls=p.risk_level.toLowerCase();
+  const d=daysUntil(p.effective_date);
+  const cd=countdownLabel(d);
+  const sla=slaLabel(p);
+  const impacts=(p.impact_areas||[]).map(a=>{const m=IMPACT_META[a]||{label:a,icon:'•'};return `<span class="tag tag-impact">${m.icon} ${m.label}</span>`}).join('');
+  const sectors=(p.routes_affected||[]).map(s=>`<span class="tag tag-sector">${s}</span>`).join('');
+  const actions=getActions(p.impact_areas);
+  const stakeholders=getStakeholders(p.impact_areas);
+  const contactNames=CONTACTS.filter(c=>stakeholders.includes(c.role)).map(c=>c.name);
+  const priCls=p.priority.toLowerCase();
+  const trigCls=triggerClass(p.trigger||'Manual');
+  const srcMap={"Live":"source-live","Schedule-Derived":"source-derived","Extrapolated":"source-extrapolated","Manual":"source-manual"};
+  const srcLabel=p.source||'Manual';
+  const srcCls=srcMap[srcLabel]||'source-manual';
+  const carriers=carriersForPlan(p).map(c=>`<span class="carrier-chip" title="${CARRIER_MAP[c]}">${c}</span>`).join('');
+  const stage=p.caseStage||'New';
+  const stageIdx=STAGE_ORDER.indexOf(stage);
+  const nextStage=stageIdx<STAGE_ORDER.length-1?STAGE_ORDER[stageIdx+1]:null;
+  const pc = p.predictiveCountdown ? timeToImpact(p.predictiveCountdown.deadline) : null;
+
+  return `<div class="alert-card ${cls}" id="card-${p.id}">
+    <div class="alert-head" onclick="toggleExpand('${p.id}')">
+      <div class="alert-icon ${cls}">${IMPACT_META[p.impact_areas[0]]?.icon||'⚠️'}</div>
+      <div class="alert-body">
+        <div class="alert-title">${p.title}</div>
+        <div class="alert-preview">${p.description.substring(0,100)}${p.description.length>100?'…':''}</div>
+      </div>
+      <div class="alert-right">
+        <span class="stage-badge stage-${stage}">${STAGE_LABEL[stage]}</span>
+        <span class="countdown ${cd.cls}">${cd.text}</span>
+        ${sla?`<span class="countdown ${sla.cls}" style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3)">⏱ ${sla.text}</span>`:''}
+        <div style="display:flex;gap:4px">
+          <span class="pill pill-${cls}">${p.risk_level}</span>
+          <span class="pill pill-${priCls}">${p.priority}</span>
+        </div>
+        <span class="trigger-badge ${trigCls}">${p.trigger||'Manual'}</span>
+        <span class="source-badge ${srcCls}" title="Data confidence — where this alert's detail came from">${srcLabel}</span>
+      </div>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="alert-expand">
+      ${pc?`<div class="predictive-chip ${pc.urgent?'predictive-urgent':'predictive-ok'}">⏱ ${p.predictiveCountdown.sector} ${p.predictiveCountdown.consequence} — ${pc.text}</div><br>`:''}
+      <div class="alert-desc">${p.description}</div>
+      ${p.patternNote?`<div class="pattern-callout"><b style="color:var(--amber)">🔁 Pattern detected:</b> ${p.patternNote}</div>`:''}
+      ${p.precedent?`<div style="font-size:10px;color:var(--dim);margin-top:6px;padding:8px 10px;background:var(--panel2);border-radius:8px;border-left:2px solid var(--accent)"><b style="color:var(--slate)">Comparable industry precedent:</b> ${p.precedent}</div>`:''}
+      <div class="tag-row" style="margin-top:8px">${impacts}${carriers}</div>
+      <div class="tag-row" style="margin-top:6px">${sectors}</div>
+      <div class="action-list">
+        <div class="action-list-title">⚡ Recommended Actions</div>
+        ${actions.map(a=>`<div class="action-item"><span class="action-bullet">▸</span> ${a}</div>`).join('')}
+      </div>
+      <div style="margin-top:12px">
+        <div class="action-list-title">🕘 Timeline <span style="font-weight:400;color:var(--dim)">— case ${p.id.toUpperCase()}</span></div>
+        ${(p.auditLog||[]).map(t=>`<div class="timeline-row"><span class="timeline-time">${t.t}</span><span><b style="color:${t.a==='Agent'?'var(--accent)':'var(--slate)'}">${t.a}</b> — ${t.x}</span></div>`).join('')}
+      </div>
+      <div class="alert-foot">
+        <div><div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:5px">📢 Notify (${contactNames.length})</div>
+          <div class="stakeholder-list">${contactNames.map(n=>`<span class="stakeholder">${n}</span>`).join('')}</div>
+          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();quickNotify('${p.id}','OCC',this)">📟 Notify OCC</button>
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();quickNotify('${p.id}','Dispatch',this)">🧭 Notify Dispatch</button>
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();quickNotify('${p.id}','Flight Ops',this)">✈️ Notify Flight Ops</button>
+            ${nextStage?`<button class="stage-advance-btn" onclick="event.stopPropagation();advanceStage('${p.id}',this)">Advance → ${STAGE_LABEL[nextStage]}</button>`:''}
+          </div>
+        </div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--dim)">Effective</div><div style="font-size:13px;font-weight:600">${p.effective_date}</div><div style="font-size:10px;color:var(--dim);margin-top:2px">Trigger: ${p.trigger||'Manual'}</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+function toggleExpand(id){document.getElementById('card-'+id).classList.toggle('expanded')}
+
+// ══ WALLBOARD — dense glanceable view for a shared/wall screen ══
+let boardView='detailed';
+function setBoardView(v){
+  boardView=v;
+  document.getElementById('toggle-detailed').classList.toggle('active',v==='detailed');
+  document.getElementById('toggle-wallboard').classList.toggle('active',v==='wallboard');
+  document.getElementById('alert-list').style.display=v==='detailed'?'block':'none';
+  document.getElementById('wallboard-view').style.display=v==='wallboard'?'block':'none';
+  if(v==='wallboard')buildWallboard();
+}
+function wallboardTileHTML(p){
+  const stage=p.caseStage||'New';
+  const riskCls='risk-'+p.risk_level.toLowerCase();
+  return `<div class="wallboard-tile ${riskCls}" onclick="setBoardView('detailed');setTimeout(()=>{const el=document.getElementById('card-${p.id}');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('expanded')}},50)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+      <span class="mono" style="font-size:9px;color:var(--dim)">${p.id.toUpperCase()}</span>
+      <span class="stage-badge stage-${stage}" style="font-size:8px;padding:2px 5px">${STAGE_LABEL[stage]}</span>
+    </div>
+    <div style="font-size:11.5px;font-weight:600;line-height:1.3;margin-bottom:6px">${p.title.length>60?p.title.slice(0,60)+'…':p.title}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span class="pill pill-${p.risk_level.toLowerCase()}" style="font-size:8px">${p.risk_level}</span>
+      <span class="mono" style="font-size:9px;color:var(--muted)">${p.effective_date.slice(5)}</span>
+    </div>
+  </div>`;
+}
+function buildWallboard(){
+  const active=PLANS.filter(p=>p.status==='Active');
+  const sorted=[...active].sort((a,b)=>{
+    const order={Red:0,Amber:1,Green:2};
+    return order[a.risk_level]-order[b.risk_level]||daysUntil(a.effective_date)-daysUntil(b.effective_date);
+  });
+  document.getElementById('wallboard-view').innerHTML =
+    `<div style="font-size:11px;color:var(--muted);margin-bottom:10px">${sorted.length} situations at a glance — click any tile to jump to its full detail. Built for a shared screen: color and stage visible without opening anything.</div>
+    <div class="wallboard-grid">${sorted.map(wallboardTileHTML).join('')}</div>`;
+}
+function buildAlerts(){
+  const active=PLANS.filter(p=>p.status==='Active');
+  const filtered=active.filter(p=>{
+    if(currentFilter==='All')return true;
+    if(['Red','Amber','Green'].includes(currentFilter))return p.risk_level===currentFilter;
+    if(['Critical','High','Medium','Low'].includes(currentFilter))return p.priority===currentFilter;
+    if(['NOTAM','Weather','Maintenance','ATC','Security','Crew System','Permit Expiry','Fuel Supplier','Schedule','Manual'].includes(currentFilter))return(p.trigger||'Manual')===currentFilter;
+    if(currentFilter.startsWith('carrier:'))return carriersForPlan(p).includes(currentFilter.split(':')[1]);
+    return(p.impact_areas||[]).includes(currentFilter);
+  });
+  const sorted=[...filtered].sort((a,b)=>{
+    const order={Red:0,Amber:1,Green:2};
+    return order[a.risk_level]-order[b.risk_level]||daysUntil(a.effective_date)-daysUntil(b.effective_date);
+  });
+  const html=sorted.length?sorted.map(alertCardHTML).join(''):'<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-text">No alerts matching this filter</div></div>';
+  document.getElementById('alert-list').innerHTML=html;
+  document.getElementById('alert-list-full').innerHTML=html;
+  const badge=document.getElementById('badge-alerts');
+  badge.textContent=active.length;
+  badge.className='nav-badge'+(active.filter(p=>p.risk_level==='Red').length?' red':' amber');
+  const liveStatus=document.getElementById('hdr-live-status');
+  if(liveStatus)liveStatus.textContent=`Scanning 3-day horizon · ${active.length} active situations · ${active.filter(p=>p.caseStage==='New').length} new`;
+}
+
+// ══ TIMELINE ══
+function buildTimeline(){
+  const active=PLANS.filter(p=>p.status==='Active');
+  const days=[];
+  for(let i=0;i<4;i++){const d=new Date(TODAY.getTime()+i*86400000);days.push({date:d,dateStr:d.toISOString().split('T')[0],items:[]})}
+  active.forEach(p=>{const d=daysUntil(p.effective_date);if(d>=0&&d<4)days[d].items.push(p)});
+  document.getElementById('day-grid').innerHTML=days.map(day=>{
+    const items=day.items;
+    const hasRed=items.some(p=>p.risk_level==='Red');
+    const hasAmber=items.some(p=>p.risk_level==='Amber');
+    const badge=hasRed?'red':hasAmber?'amber':items.length?'green':'empty';
+    const dn=day.date.toLocaleDateString('en-GB',{weekday:'short'});
+    const dd=day.date.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    const isT=day.date.toDateString()===TODAY.toDateString();
+    return `<div class="day-col"><div class="day-hdr"><div><div class="day-name">${isT?'Today':dn}</div><div class="day-date">${dd}</div></div><span class="day-badge ${badge}">${items.length||'∅'}</span></div>
+    ${items.length?items.map(p=>{const cls=p.risk_level.toLowerCase();return `<div class="day-item ${cls}" onclick="showView('alerts')"><div class="day-item-title">${p.title.substring(0,50)}${p.title.length>50?'…':''}</div><div class="day-item-meta">${IMPACT_META[p.impact_areas[0]]?.icon||''} ${(p.routes_affected||[]).slice(0,2).join(', ')}${(p.routes_affected||[]).length>2?' +'+(p.routes_affected.length-2):''}</div></div>`}).join(''):'<div class="day-empty">No plans ✅</div>'}</div>`;
+  }).join('');
+}
+
+// ══ SCENARIOS ══
+function buildScenarios(){
+  document.getElementById('scenario-grid').innerHTML=SCENARIOS.map((s,i)=>{
+    const tags=s.triggers.map(t=>`<span class="scenario-tag trigger">${t}</span>`).join('');
+    const impacts=s.impacts.map(t=>`<span class="scenario-tag impact">${t}</span>`).join('');
+    return `<div class="scenario-card" onclick="useScenario(${i})">
+      <div class="scenario-card-head"><span class="scenario-icon">${s.icon}</span><span class="scenario-title">${s.title}</span></div>
+      <div class="scenario-desc">${s.desc}</div>
+      ${s.precedent?`<div style="font-size:9px;color:var(--dim);margin-bottom:8px;padding:6px 8px;background:var(--panel2);border-radius:6px;border-left:2px solid #a855f7"><b style="color:var(--slate)">Precedent:</b> ${s.precedent}</div>`:''}
+      <div class="scenario-tags">${tags} ${impacts}</div>
+    </div>`;
+  }).join('');
+}
+function useScenario(i){
+  const s=SCENARIOS[i];
+  showView('add-plan');
+  document.getElementById('f-title').value=s.pre+' ';
+  document.getElementById('f-desc').focus();
+}
+
+// ══ CONTACTS ══
+function buildContacts(){
+  document.getElementById('contact-grid').innerHTML=CONTACTS.map(c=>{
+    const initials=c.name.split(' ').map(n=>n[0]).join('');
+    return `<div class="contact-card"><div class="contact-top"><div class="contact-avatar">${initials}</div><div><div class="contact-name">${c.name}</div><div class="contact-role">${c.role}</div></div></div><div class="contact-info">${c.email}<br>${c.phone}</div><div class="contact-channels"><span class="ch ${c.notify_email?'ch-on':'ch-off'}">📧 Email</span><span class="ch ${c.notify_whatsapp?'ch-on':'ch-off'}">💬 WhatsApp</span></div></div>`;
+  }).join('');
+}
+
+// ══ NOTIFICATIONS ══
+function buildNotifications(){
+  document.getElementById('notif-tbody').innerHTML=NOTIFICATIONS.map(n=>{
+    const rc=n.risk.toLowerCase(),pc=n.priority.toLowerCase(),sc=n.status.toLowerCase();
+    return `<tr><td>${n.date}</td><td>${n.plan}</td><td><span class="pill pill-${rc}">${n.risk}</span></td><td><span class="pill pill-${pc}">${n.priority}</span></td><td style="font-size:10px;color:var(--muted)">${n.contacts}</td><td><span class="status-badge status-${sc}">${n.status}</span></td></tr>`;
+  }).join('');
+}
+
+// ══ ADD FORM ══
+const impactOptions=Object.keys(IMPACT_META);
+let selectedImpacts=[];
+function buildImpactChips(){
+  document.getElementById('impact-chips').innerHTML=impactOptions.map(o=>{const m=IMPACT_META[o];return `<span class="chip-opt" onclick="toggleImpact('${o}',this)" data-impact="${o}">${m.icon} ${m.label}</span>`}).join('');
+}
+function toggleImpact(val,el){el.classList.toggle('selected');selectedImpacts=impactOptions.filter(o=>document.querySelector(`[data-impact="${o}"]`).classList.contains('selected'));updateRiskPreview()}
+function updateRiskPreview(){
+  const routes=document.getElementById('f-routes').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!selectedImpacts.length){document.getElementById('preview-risk-text').textContent='Select impact areas to see risk level';document.getElementById('preview-risk-text').style.color='var(--muted)';document.getElementById('preview-detail').textContent='';return}
+  const risk=calcRisk(selectedImpacts,routes.length);
+  const w=selectedImpacts.reduce((s,a)=>s+(IMPACT_META[a]?.weight||3),0);
+  document.getElementById('preview-risk-text').textContent=`${risk} Risk — Weight ${w} · ${routes.length} sectors`;
+  document.getElementById('preview-risk-text').style.color=RISK_COLORS[risk];
+  document.getElementById('preview-detail').textContent=`Will notify: ${getStakeholders(selectedImpacts).join(', ')}`;
+}
+document.addEventListener('input',e=>{if(e.target.id==='f-routes')updateRiskPreview()});
+function submitPlan(){
+  const title=document.getElementById('f-title').value.trim(),date=document.getElementById('f-date').value;
+  if(!title||!date){alert('Please fill in the title and effective date.');return}
+  PLANS.push({id:'p'+(PLANS.length+1),title,effective_date:date,impact_areas:[...selectedImpacts],routes_affected:document.getElementById('f-routes').value.split(',').map(s=>s.trim()).filter(Boolean),priority:document.getElementById('f-priority').value,risk_level:calcRisk(selectedImpacts,document.getElementById('f-routes').value.split(',').filter(Boolean).length),status:'Active',trigger:document.getElementById('f-source').value,description:document.getElementById('f-desc').value.trim()||title});
+  buildHero();buildKPIs();buildAlerts();buildTimeline();
+  alert(`✅ Plan logged!\n\nRisk: ${calcRisk(selectedImpacts,0)}\n\nAlert is now on the dashboard.`);
+  resetForm();showView('dashboard');
+}
+function resetForm(){['f-title','f-date','f-desc','f-routes','f-ac'].forEach(id=>document.getElementById(id).value='');selectedImpacts=[];buildImpactChips();updateRiskPreview()}
+
+// ══ QUICK NOTIFY ══
+function quickNotify(planId,role,btnEl){
+  const p=PLANS.find(x=>x.id===planId);
+  if(!p)return;
+  const contactsForRole=CONTACTS.filter(c=>{
+    if(role==='OCC')return c.role.includes('Controller');
+    if(role==='Dispatch')return c.role.includes('Dispatch')||c.role.includes('Controller');
+    if(role==='Flight Ops')return c.role.includes('Flight Ops');
+    return true;
+  }).map(c=>c.name);
+  const names=contactsForRole.length?contactsForRole.join(', '):'On-duty '+role;
+  NOTIFICATIONS.unshift({date:new Date().toISOString().split('T')[0],plan:p.title,risk:p.risk_level,priority:p.priority,contacts:names,status:'Sent'});
+  if(!p.auditLog)p.auditLog=[];
+  p.auditLog.push({t:'now',a:'You',x:'Notified '+role+' ('+names+').'});
+  buildNotifications();
+  if(btnEl){const orig=btnEl.textContent;btnEl.textContent='✓ Sent';btnEl.disabled=true;setTimeout(()=>{btnEl.textContent=orig;btnEl.disabled=false},1800)}
+}
+
+// ══ SHIFT HANDOVER ══
+function openHandover(){
+  const active=PLANS.filter(p=>p.status==='Active');
+  const red=active.filter(p=>p.risk_level==='Red');
+  const amber=active.filter(p=>p.risk_level==='Amber');
+  const now=new Date().toISOString().slice(0,16).replace('T',' ')+'Z';
+  let t=`PRE-OPS SHIFT HANDOVER — ${now}\n`;
+  t+=`${'='.repeat(50)}\n`;
+  t+=`Active plans: ${active.length}  |  Red: ${red.length}  |  Amber: ${amber.length}\n\n`;
+  t+=`── RED / CRITICAL — ACT THIS SHIFT ──\n`;
+  if(!red.length)t+='(none)\n';
+  red.forEach(p=>{
+    const sla=slaLabel(p);
+    t+=`\n• ${p.title}\n  Effective: ${p.effective_date}${sla?'  ['+sla.text+']':''}\n  Sectors: ${(p.routes_affected||[]).join(', ')}\n  Trigger: ${p.trigger||'Manual'}  |  Source: ${p.source||'Manual'}\n  Next action: ${getActions(p.impact_areas)[0]||'Monitor'}\n`;
+  });
+  t+=`\n── AMBER — MONITOR / PLAN REQUIRED ──\n`;
+  if(!amber.length)t+='(none)\n';
+  amber.forEach(p=>{
+    t+=`\n• ${p.title}\n  Effective: ${p.effective_date}\n  Sectors: ${(p.routes_affected||[]).slice(0,3).join(', ')}${(p.routes_affected||[]).length>3?' +'+(p.routes_affected.length-3):''}\n`;
+  });
+  t+=`\n${'='.repeat(50)}\nGenerated by Pre-Ops Intelligence · verify against live NOTAM/roster feed before acting\n`;
+  document.getElementById('handover-text').value=t;
+  document.getElementById('handover-overlay').classList.add('open');
+}
+function closeHandover(){document.getElementById('handover-overlay').classList.remove('open')}
+function copyHandover(btnEl){
+  const ta=document.getElementById('handover-text');
+  ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  if(btnEl){const orig=btnEl.textContent;btnEl.textContent='✓ Copied';setTimeout(()=>{btnEl.textContent=orig},1500)}
+}
+
+// ══ INIT ══
+buildHero();buildKPIs();buildExposurePanel();buildFilterBar();buildAlerts();buildTimeline();buildScenarios();buildContacts();buildNotifications();buildImpactChips();
+
+// ══ GENERATION STATUS STRIP ══
+function renderGenStatus(){
+  const info = typeof GENERATION_INFO !== 'undefined' ? GENERATION_INFO : null;
+  const dot = document.getElementById('gen-status-dot');
+  const genEl = document.getElementById('gen-generated-at');
+  const nextEl = document.getElementById('gen-next-scheduled');
+  const srcEl = document.getElementById('gen-source-note');
+  if(!info || info.generated_at==='__PLACEHOLDER__'){
+    dot.style.background='var(--red)';
+    genEl.textContent='Generated: unknown — this file was opened directly, not produced by generate_daily_plan.js';
+    nextEl.textContent='Next scheduled refresh: none configured yet';
+    srcEl.innerHTML='⚠ Not deployed to a scheduled host. See RUNBOOK.md — "Getting rid of the daily download entirely."';
+    srcEl.style.color='var(--amber)';
+    return;
+  }
+  const genDate=new Date(info.generated_at);
+  const ageMs=new Date()-genDate;
+  const ageH=Math.floor(ageMs/3600000);
+  const stale = ageH>=27; // more than a day+buffer old means the schedule likely isn't running
+  dot.style.background = info.deployed ? (stale?'var(--amber)':'var(--green)') : 'var(--red)';
+  genEl.textContent = `Generated: ${genDate.toUTCString().slice(0,22)} UTC (${ageH}h ago)`;
+  nextEl.textContent = `Next scheduled refresh: ${info.next_scheduled_utc ? new Date(info.next_scheduled_utc).toUTCString().slice(0,22)+' UTC' : '—'}`;
+  if(!info.deployed){
+    srcEl.innerHTML='⚠ Running from a local/manual generation, not a deployed schedule. See RUNBOOK.md.';
+    srcEl.style.color='var(--amber)';
+  } else if(stale){
+    srcEl.innerHTML='⚠ This is older than expected for a daily schedule — check the Actions tab / cron log for a missed run.';
+    srcEl.style.color='var(--amber)';
+  } else {
+    srcEl.textContent = 'Source: ' + info.source;
+    srcEl.style.color = 'var(--muted)';
+  }
+}
+renderGenStatus();
+
+// ══ IN-PAGE REFRESH — pulls fresh data via fetch, updates everything live, no reload/download ══
+// Works once this page is hosted somewhere that also serves data/plans.json,
+// data/notifications.json and data/meta.json alongside it (which is exactly
+// what the GitHub Actions workflow publishes). Opened as a local file
+// (file://), this will correctly fail and say why rather than hang silently.
+async function refreshDataInPlace(){
+  const btn=document.getElementById('gen-refresh-btn');
+  const srcEl=document.getElementById('gen-source-note');
+  const orig=btn.textContent;
+  btn.textContent='⏳ Checking…';
+  btn.disabled=true;
+  try{
+    const bust = '?t=' + Date.now(); // cache-bust so a hosted CDN doesn't serve a stale copy
+    const [metaResp, plansResp, notifResp] = await Promise.all([
+      fetch('data/meta.json'+bust),
+      fetch('data/plans.json'+bust),
+      fetch('data/notifications.json'+bust)
+    ]);
+    if(!metaResp.ok || !plansResp.ok || !notifResp.ok){
+      throw new Error(`HTTP ${metaResp.status}/${plansResp.status}/${notifResp.status}`);
+    }
+    const meta = await metaResp.json();
+    const newPlans = await plansResp.json();
+    const newNotifications = await notifResp.json();
+
+    const currentGeneratedAt = (typeof GENERATION_INFO!=='undefined' && GENERATION_INFO.generated_at!=='__PLACEHOLDER__') ? GENERATION_INFO.generated_at : null;
+    const isNewer = !currentGeneratedAt || new Date(meta.generated_at) > new Date(currentGeneratedAt);
+
+    // swap the in-memory data and re-render every view that depends on it —
+    // this is the actual "no reload, no download" part
+    PLANS.length = 0; PLANS.push(...newPlans);
+    NOTIFICATIONS.length = 0; NOTIFICATIONS.push(...newNotifications);
+    if(typeof GENERATION_INFO!=='undefined'){
+      GENERATION_INFO.generated_at = meta.generated_at;
+      GENERATION_INFO.deployed = true; // if we could fetch data/*.json at all, this IS being served, not opened locally
+      GENERATION_INFO.source = GENERATION_INFO.source==='manual/local run (node generate_daily_plan.js)' ? 'GitHub Actions scheduled workflow' : GENERATION_INFO.source;
+    }
+
+    buildHero();buildKPIs();buildExposurePanel();buildFilterBar();buildAlerts();buildTimeline();buildScenarios();buildContacts();buildNotifications();buildImpactChips();
+    renderGenStatus();
+
+    btn.textContent = isNewer ? '✓ Updated!' : '✓ Already current';
+    setTimeout(()=>{btn.textContent=orig;btn.disabled=false},2200);
+  }catch(e){
+    let reason = e.message;
+    if(location.protocol==='file:'){
+      reason = "can't fetch from a local file:// page — this only works once hosted (see RUNBOOK.md). This is expected, not a bug.";
+    }
+    srcEl.innerHTML = `⚠ Refresh failed: ${reason}`;
+    srcEl.style.color='var(--red)';
+    btn.textContent='✗ Failed';
+    setTimeout(()=>{btn.textContent=orig;btn.disabled=false},2500);
+  }
+}
+
+// ══ AUTO-REFRESH ══
+// For a browser tab left open (e.g. an ops-room wallboard screen), reload
+// periodically so it picks up the next scheduled generation without anyone
+// touching it. This does NOT replace the daily generation job — it just
+// makes an already-open tab notice when a new version has been published.
+(function(){
+  const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes — adjust to taste
+  let refreshTimer = setTimeout(doAutoRefresh, REFRESH_INTERVAL_MS);
+  function doAutoRefresh(){
+    // Pause auto-refresh while someone has a card/modal open so it doesn't
+    // yank the page out from under an active read — check again shortly instead.
+    const anyExpanded = document.querySelector('.alert-card.expanded') || document.getElementById('case-modal-overlay');
+    if(anyExpanded){ refreshTimer = setTimeout(doAutoRefresh, 60*1000); return; }
+    location.reload();
+  }
+  document.addEventListener('visibilitychange', ()=>{
+    // if the tab regains focus after being backgrounded, check sooner rather
+    // than waiting out the full interval — catches "left overnight" cases.
+    if(document.visibilityState==='visible'){
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(doAutoRefresh, REFRESH_INTERVAL_MS);
+    }
+  });
+})();
+
+
+
+// ══ ROUTE BRIEF — LIVE WEATHER (NOAA Aviation Weather Center — free, no key, global METAR/TAF) ══
+const AIRPORT_NAMES={OMSJ:"Sharjah Intl",OMDB:"Dubai Intl",OOMS:"Muscat (MCT)",HSSS:"Khartoum (KRT)",HECA:"Cairo (CAI)",VTBS:"Bangkok (BKK)",LTFM:"Istanbul (IST)",OPKC:"Karachi (KHI)",OEJN:"Jeddah (JED)",OIII:"Tehran (THR)",OMAA:"Abu Dhabi (AUH)",OMDW:"Al Maktoum (DWC)",OERK:"Riyadh (RUH)",OTHH:"Doha (DOH)",OBBI:"Bahrain (BAH)",OKBK:"Kuwait (KWI)",OJAI:"Amman (AMM)",OLBA:"Beirut (BEY)",LEBL:"Barcelona (BCN)",LFPG:"Paris (CDG)",EGLL:"London (LHR)",EDDF:"Frankfurt (FRA)",VOMM:"Chennai (MAA)",VABB:"Mumbai (BOM)",VOBL:"Bangalore (BLR)",VECC:"Kolkata (CCU)",VTSP:"Phuket (HKT)",VVTS:"Ho Chi Minh (SGN)",OMRK:"Ras Al Khaimah (RKT)",OEDF:"Dammam (DMM)",OEMA:"Medina (MED)",OETF:"Taif (TIF)",OETB:"Tabuk (TUU)",OEAB:"Abha (AHB)",OEHL:"Hail (HAS)",HEAX:"Alexandria (ALY)",ORBI:"Baghdad (BGW)",ORER:"Erbil (EBL)",OSAP:"Aleppo (ALP)",ORMM:"Basra (BSR)",OPIS:"Islamabad (ISB)",OPLA:"Lahore (LHE)",OPPS:"Peshawar (PEW)",OPST:"Sialkot (SKT)",OPQT:"Quetta (UET)",OPFA:"Faisalabad (LYP)",WMKK:"Kuala Lumpur (KUL)",VGEG:"Chittagong (CGP)",VGHS:"Dhaka (DAC)",VRMM:"Male (MLE)",VNKT:"Kathmandu (KTM)",VCBI:"Colombo (CMB)",GMMN:"Casablanca (CMN)",GMME:"Rabat (RBA)",GMFF:"Fez (FEZ)",GMTT:"Tangier (TNG)",LFLL:"Lyon (LYS)",LFBD:"Bordeaux (BOD)",LFMT:"Montpellier (MPL)"};
+const IATA_TO_ICAO={SHJ:"OMSJ",DXB:"OMDB",AUH:"OMAA",RKT:"OMRK",DWC:"OMDW",MCT:"OOMS",JED:"OEJN",RUH:"OERK",DMM:"OEDF",MED:"OEMA",TIF:"OETF",TUU:"OETB",AHB:"OEAB",HAS:"OEHL",CAI:"HECA",ALY:"HEAX",BEY:"OLBA",AMM:"OJAI",BGW:"ORBI",EBL:"ORER",ALP:"OSAP",BSR:"ORMM",KHI:"OPKC",ISB:"OPIS",LHE:"OPLA",PEW:"OPPS",SKT:"OPST",UET:"OPQT",LYP:"OPFA",BKK:"VTBS",HKT:"VTSP",KUL:"WMKK",CGP:"VGEG",DAC:"VGHS",MLE:"VRMM",KTM:"VNKT",CMB:"VCBI",CMN:"GMMN",RBA:"GMME",FEZ:"GMFF",TNG:"GMTT",CDG:"LFPG",LYS:"LFLL",BOD:"LFBD",MPL:"LFMT",DOH:"OTHH",KWI:"OKBK",BAH:"OBBI",IST:"LTFM",KRT:"HSSS"};
+function toICAO(code){
+  code=(code||'').toUpperCase().trim();
+  if(code.length===4)return code; // already ICAO
+  return IATA_TO_ICAO[code]||null;
+}
+const AWC_BASE="https://aviationweather.gov/api/data";
+async function awcFetchMetar(icaoIds){
+  if(!icaoIds.length)return[];
+  const resp=await fetch(`${AWC_BASE}/metar?ids=${icaoIds.join(',')}&format=json`);
+  if(!resp.ok)throw new Error('AWC METAR request failed: '+resp.status);
+  return await resp.json();
+}
+async function awcFetchTaf(icaoIds){
+  if(!icaoIds.length)return[];
+  const resp=await fetch(`${AWC_BASE}/taf?ids=${icaoIds.join(',')}&format=json`);
+  if(!resp.ok)throw new Error('AWC TAF request failed: '+resp.status);
+  return await resp.json();
+}
+function deriveWxAlerts(m){
+  const alerts=[];
+  const vis=m.visib!=null?parseFloat(m.visib):null; // statute miles in AWC json
+  if(vis!=null&&vis<3)alerts.push({severity:vis<1?'Red':'Amber',type:'LOW VISIBILITY',detail:vis+' sm visibility reported'});
+  if(m.wgst&&m.wgst>=35)alerts.push({severity:'Red',type:'HIGH WIND GUST',detail:m.wgst+'kt gust reported'});
+  else if(m.wgst&&m.wgst>=25)alerts.push({severity:'Amber',type:'WIND GUST',detail:m.wgst+'kt gust reported'});
+  const wx=(m.wxString||'').toUpperCase();
+  if(wx.includes('TS'))alerts.push({severity:'Red',type:'THUNDERSTORM',detail:'TS reported in current METAR'});
+  if(wx.includes('FG')||wx.includes('BR'))alerts.push({severity:'Amber',type:'FOG/MIST',detail:wx});
+  if(wx.includes('SA')||wx.includes('DU')||wx.includes('SS'))alerts.push({severity:'Amber',type:'SAND/DUST',detail:wx});
+  if(m.temp!=null&&m.temp>=45)alerts.push({severity:'Amber',type:'EXTREME HEAT',detail:m.temp+'°C — performance penalty likely'});
+  if(m.fltCat==='LIFR')alerts.push({severity:'Red',type:'LIFR',detail:'Low IFR flight category'});
+  else if(m.fltCat==='IFR')alerts.push({severity:'Amber',type:'IFR',detail:'IFR flight category'});
+  return alerts;
+}
+
+async function fetchRouteBrief(){
+  const dep=document.getElementById('rb-dep').value.toUpperCase().trim();
+  const arr=document.getElementById('rb-arr').value.toUpperCase().trim();
+  const divs=document.getElementById('rb-div').value.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean);
+  if(!dep&&!arr){alert('Please enter at least a departure or arrival airport.');return}
+  const c=document.getElementById('route-brief-content');
+  c.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:14px;color:var(--accent)">Fetching live METAR/TAF from NOAA Aviation Weather Center...</div><div style="font-size:11px;color:var(--muted);margin-top:6px">Free public feed — no API key required</div></div>';
+  const roles={};
+  if(dep)roles[dep]='departure';
+  if(arr)roles[arr]='arrival';
+  divs.forEach(d=>{if(!roles[d])roles[d]='diversion'});
+  const codes=Object.keys(roles);
+  const icaoMap={};const unmapped=[];
+  codes.forEach(code=>{const icao=toICAO(code);if(icao)icaoMap[code]=icao;else unmapped.push(code)});
+  const icaoList=[...new Set(Object.values(icaoMap))];
+  try{
+    const [metars,tafs]=await Promise.all([awcFetchMetar(icaoList),awcFetchTaf(icaoList)]);
+    const weather=codes.filter(code=>icaoMap[code]).map(code=>{
+      const icao=icaoMap[code];
+      const m=metars.find(x=>x.icaoId===icao)||{};
+      const taf=tafs.find(x=>x.icaoId===icao);
+      const alerts=Object.keys(m).length?deriveWxAlerts(m):[];
+      return{airport:code,icao,name:AIRPORT_NAMES[icao]||icao,role:roles[code],current:m,taf,alerts,noData:!Object.keys(m).length};
+    });
+    renderRouteBrief({weather,unmapped,route:{all_airports:codes}});
+  }catch(e){
+    c.innerHTML='<div style="color:var(--red);font-size:13px;padding:12px;background:var(--panel2);border-radius:10px">Live weather fetch failed: '+e.message+'<br><br><span style="color:var(--muted);font-size:11px">If you opened this file directly (file://) some browsers block cross-origin fetches from local files. Try hosting it (e.g. <code>python3 -m http.server</code> and open via http://localhost) or serving it from any static host.</span></div>';
+  }
+}
+
+function renderRouteBrief(data){
+  const c=document.getElementById('route-brief-content');
+  const redCount=data.weather.filter(w=>w.alerts.some(a=>a.severity==='Red')).length;
+  const amberCount=data.weather.filter(w=>w.alerts.some(a=>a.severity==='Amber')&&!w.alerts.some(a=>a.severity==='Red')).length;
+  let html='<div style="background:linear-gradient(135deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:14px;padding:16px 20px;margin-bottom:16px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">';
+  html+='<div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px">Live Route Weather · NOAA AWC</div>';
+  html+='<div style="font-size:13px;color:var(--slate)">'+data.route.all_airports.join(' → ')+'</div></div>';
+  html+='<div style="display:flex;gap:12px;flex-wrap:wrap">';
+  html+='<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--red)">'+redCount+'</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Red Stations</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--amber)">'+amberCount+'</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase">Amber Stations</div></div>';
+  html+='</div></div></div>';
+
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:16px">';
+  for(const w of data.weather){
+    if(w.noData){html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;opacity:.6"><div style="font-size:13px;font-weight:700">'+w.airport+' ('+w.icao+')</div><div style="font-size:11px;color:var(--muted);margin-top:4px">No current METAR returned by AWC for this station (may not report internationally, or temporarily off the network).</div></div>';continue}
+    const hasAlerts=w.alerts.length;
+    const bc=hasAlerts?(w.alerts.some(a=>a.severity==='Red')?'var(--red)':'var(--amber)'):'var(--green)';
+    const m=w.current;
+    html+='<div style="background:var(--panel);border:1px solid '+bc+';border-radius:10px;padding:12px;border-left:3px solid '+bc+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">';
+    html+='<div><div style="font-size:13px;font-weight:700">'+w.airport+' <span style="color:var(--dim);font-weight:400">('+w.icao+')</span></div><div style="font-size:10px;color:var(--muted)">'+w.name+'</div></div>';
+    html+='<div style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:5px;text-transform:uppercase;background:'+(w.role==='departure'?'rgba(52,211,153,.1)':w.role==='arrival'?'rgba(56,189,248,.1)':'var(--panel3)')+';color:'+(w.role==='departure'?'var(--green)':w.role==='arrival'?'#38bdf8':'var(--slate)')+'">'+w.role+'</div>';
+    html+='</div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">';
+    html+='<div><span style="color:var(--muted)">Temp:</span> <b>'+(m.temp??'—')+'°C</b></div>';
+    html+='<div><span style="color:var(--muted)">Category:</span> <b>'+(m.fltCat||'—')+'</b></div>';
+    html+='<div><span style="color:var(--muted)">Wind:</span> <b>'+(m.wdir??'—')+'°/'+(m.wspd??'—')+'kt</b>'+(m.wgst?' G'+m.wgst:'')+'</div>';
+    html+='<div><span style="color:var(--muted)">Vis:</span> <b>'+(m.visib??'—')+' sm</b></div>';
+    html+='</div>';
+    html+='<div style="font-size:9px;color:var(--dim);margin-top:6px;font-family:monospace;word-break:break-all">'+(m.rawOb||'')+'</div>';
+    if(w.taf&&w.taf.rawTAF){html+='<div style="font-size:9px;color:var(--slate);margin-top:4px;padding-top:4px;border-top:1px solid var(--border);font-family:monospace;word-break:break-all"><b>TAF:</b> '+w.taf.rawTAF+'</div>'}
+    if(hasAlerts){
+      html+='<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">';
+      for(const a of w.alerts){
+        const ac=a.severity==='Red'?'var(--red)':'var(--amber)';
+        html+='<div style="display:flex;align-items:center;gap:5px;font-size:10px;margin-bottom:3px"><div style="width:6px;height:6px;border-radius:50%;background:'+ac+';flex-shrink:0"></div><span style="color:'+ac+';font-weight:600;text-transform:uppercase">'+a.type+'</span> <span style="color:var(--muted)">'+a.detail+'</span></div>';
+      }
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+
+  if(data.unmapped&&data.unmapped.length){
+    html+='<div style="font-size:11px;color:var(--muted);margin-bottom:12px">No ICAO mapping on file for: '+data.unmapped.join(', ')+'. Enter the 4-letter ICAO code directly to fetch it.</div>';
+  }
+
+  html+='<div style="background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:11px;color:var(--muted)">';
+  html+='<div style="font-weight:600;color:var(--slate);margin-bottom:4px">📋 NOTAMs — not included here</div>';
+  html+='There is no genuinely free, global, no-key NOTAM feed. The FAA\'s free NOTAM API only covers the US National Airspace System — it returns nothing for SHJ, DXB, JED, KHI, BEY etc. Paste real NOTAM text into the <a href="#" onclick="showView(\'notam\');return false" style="color:var(--accent)">NOTAM Parser</a> tab, or connect a paid feed (Cirium, Aviation Edge, or your GDS/AIS provider) for live ingestion.';
+  html+='</div>';
+
+  c.innerHTML=html;
+}
+
+// ══ LIVE WEATHER — NETWORK SCAN (real AWC data for network hub stations) ══
+const NETWORK_HUBS=["SHJ","AUH","DXB","JED","RUH","DMM","KHI","ISB","LHE","CAI","ALY","BEY","AMM","CMN","BKK","KUL"];
+const HUB_COORDS={SHJ:[25.3286,55.5172],AUH:[24.4330,54.6511],DXB:[25.2532,55.3657],JED:[21.6796,39.1565],RUH:[24.9576,46.6988],DMM:[26.4712,49.7979],KHI:[24.9065,67.1608],ISB:[33.6167,72.9856],LHE:[31.5216,74.4036],CAI:[30.1219,31.4056],ALY:[30.9000,29.6889],BEY:[33.8209,35.4884],AMM:[31.7226,35.9932],CMN:[33.3675,-7.5900],BKK:[13.6900,100.7501],KUL:[2.7456,101.7099]};
+
+function toggleKeyVisibility(){
+  const el=document.getElementById('tio-key');
+  el.type=el.type==='password'?'text':'password';
+}
+function wxCodeLabel(code){
+  const map={1000:'Clear',1001:'Cloudy',1100:'Mostly Clear',1101:'Partly Cloudy',1102:'Mostly Cloudy',2000:'Fog',2100:'Light Fog',4000:'Drizzle',4001:'Rain',4200:'Light Rain',4201:'Heavy Rain',5000:'Snow',5001:'Flurries',5100:'Light Snow',5101:'Heavy Snow',6000:'Freezing Drizzle',6001:'Freezing Rain',7000:'Ice Pellets',8000:'Thunderstorm'};
+  return map[code]||('Code '+code);
+}
+async function fetchTomorrowDaily(lat,lon,key){
+  const url=`https://api.tomorrow.io/v4/weather/forecast?location=${lat},${lon}&apikey=${key}`;
+  const resp=await fetch(url);
+  if(!resp.ok)throw new Error('HTTP '+resp.status+(resp.status===401||resp.status===403?' (invalid/unauthorized key)':''));
+  const data=await resp.json();
+  return (data.timelines&&data.timelines.daily)||[];
+}
+async function fetchTomorrowRecentHistory(lat,lon,key){
+  const url=`https://api.tomorrow.io/v4/weather/history/recent?location=${lat},${lon}&apikey=${key}`;
+  const resp=await fetch(url);
+  if(!resp.ok){
+    const code=resp.status;
+    let reason=`HTTP ${code}`;
+    if(code===403||code===401)reason+=' — likely not included on your current Tomorrow.io plan (Recent History/Historical is often a premium add-on)';
+    throw new Error(reason);
+  }
+  const data=await resp.json();
+  return (data.timelines&&data.timelines.hourly)||[];
+}
+async function fetchTomorrowAll(){
+  const key=document.getElementById('tio-key').value.trim();
+  const c=document.getElementById('tio-content');
+  if(!key){c.innerHTML='<div style="color:var(--amber);font-size:12px;padding:10px;background:var(--panel2);border-radius:8px">Paste your Tomorrow.io API key above first.</div>';return}
+  c.innerHTML='<div style="text-align:center;padding:24px"><div style="font-size:13px;color:var(--accent)">Fetching 3-day forecast + recent history for '+NETWORK_HUBS.length+' hubs from Tomorrow.io...</div></div>';
+  const results=[];
+  for(const code of NETWORK_HUBS){
+    const coords=HUB_COORDS[code];
+    if(!coords){results.push({airport:code,error:'No coordinates on file'});continue}
+    const[lat,lon]=coords;
+    const entry={airport:code};
+    try{
+      const daily=await fetchTomorrowDaily(lat,lon,key);
+      entry.daily=daily.slice(0,3);
+    }catch(e){entry.forecastError=e.message}
+    try{
+      const hourly=await fetchTomorrowRecentHistory(lat,lon,key);
+      entry.recentHistory=hourly;
+    }catch(e){entry.historyError=e.message}
+    results.push(entry);
+  }
+  renderTomorrowResults(results);
+}
+function renderTomorrowResults(results){
+  const c=document.getElementById('tio-content');
+  let html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">';
+  for(const r of results){
+    html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px">';
+    html+='<div style="font-size:13px;font-weight:700;margin-bottom:6px">'+r.airport+'</div>';
+    if(r.error){html+='<div style="font-size:11px;color:var(--muted)">'+r.error+'</div></div>';continue}
+    if(r.daily&&r.daily.length){
+      html+='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">3-Day Forecast</div>';
+      for(const d of r.daily){
+        const v=d.values;
+        const day=(d.time||'').slice(0,10);
+        html+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid var(--border)">';
+        html+='<span>'+day+'</span><span>'+Math.round(v.temperatureMin)+'–'+Math.round(v.temperatureMax)+'°C</span><span>'+(v.precipitationProbabilityAvg??0)+'% precip</span><span>'+Math.round(v.windGustMax||0)+'kt gust</span>';
+        html+='</div>';
+      }
+    } else if(r.forecastError){
+      html+='<div style="font-size:11px;color:var(--red)">Forecast: '+r.forecastError+'</div>';
+    }
+    if(r.recentHistory&&r.recentHistory.length){
+      html+='<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 4px">Last 24h (recent history)</div>';
+      const last=r.recentHistory.slice(-3);
+      for(const h of last){
+        const v=h.values;
+        html+='<div style="font-size:10px;color:var(--slate)">'+ (h.time||'').slice(11,16)+'Z — '+Math.round(v.temperature)+'°C, '+wxCodeLabel(v.weatherCode)+'</div>';
+      }
+    } else if(r.historyError){
+      html+='<div style="font-size:10px;color:var(--dim);margin-top:6px">Recent history: '+r.historyError+'</div>';
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--dim);margin-top:10px">Full multi-year historical archive (Tomorrow.io\'s dedicated /historical endpoint) is a separate premium product per their docs — the above "recent history" is the last ~24h only, and only works if your plan includes it.</div>';
+  c.innerHTML=html;
+}
+
+async function fetchWeatherAll(){
+  const c=document.getElementById('weather-content');
+  c.innerHTML='<div style="text-align:center;padding:40px"><div style="font-size:14px;color:var(--accent)">Fetching live METAR for '+NETWORK_HUBS.length+' network hub airports...</div><div style="font-size:11px;color:var(--muted);margin-top:6px">NOAA Aviation Weather Center — free, no API key</div></div>';
+  const icaoList=[...new Set(NETWORK_HUBS.map(toICAO).filter(Boolean))];
+  try{
+    const metars=await awcFetchMetar(icaoList);
+    const results=NETWORK_HUBS.map(code=>{
+      const icao=toICAO(code);
+      const m=icao?metars.find(x=>x.icaoId===icao):null;
+      if(!m)return{airport:code,error:icao?'No current METAR returned':'No ICAO mapping on file'};
+      return{airport:code,airport_name:AIRPORT_NAMES[icao]||icao,current:{visibility:m.visib,temp:m.temp,wind:m.wspd,gust:m.wgst},alerts:deriveWxAlerts(m)};
+    });
+    const redAlerts=results.reduce((s,r)=>s+(r.alerts||[]).filter(a=>a.severity==='Red').length,0);
+    renderWeatherGrid({results,airports_scanned:icaoList.length,red_alerts:redAlerts,scan_time:new Date().toISOString()});
+  }catch(e){
+    c.innerHTML='<div style="color:var(--red);font-size:13px;padding:12px;background:var(--panel2);border-radius:10px">Live weather fetch failed: '+e.message+'<br><br><span style="color:var(--muted);font-size:11px">If opened as a local file (file://), some browsers block this fetch. Serve the file over http:// (e.g. <code>python3 -m http.server</code>) for reliable results.</span></div>';
+  }
+}
+
+
+function renderWeatherGrid(data){
+  const c=document.getElementById('weather-content');
+  const r=data.results||[];
+  let html='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">';
+  for(const w of r){
+    if(w.error){html+='<div style="background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;opacity:.5"><div style="font-size:13px;font-weight:600">'+w.airport+'</div><div style="font-size:11px;color:var(--muted)">'+w.error+'</div></div>';continue}
+    const hasAlerts=w.alerts&&w.alerts.length;
+    const bc=hasAlerts?w.alerts.some(a=>a.severity==='Red')?'var(--red)':w.alerts.some(a=>a.severity==='Amber')?'var(--amber)':'var(--green)':'var(--border)';
+    const cur=w.current||{};
+    html+='<div style="background:var(--panel);border:1px solid '+bc+';border-radius:10px;padding:12px;border-left:3px solid '+bc+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">';
+    html+='<div><div style="font-size:13px;font-weight:700">'+w.airport+'</div><div style="font-size:10px;color:var(--muted)">'+(w.airport_name||'')+'</div></div>';
+    if(hasAlerts){html+='<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+(w.alerts.some(a=>a.severity==='Red')?'rgba(248,113,113,.12)':'rgba(251,191,36,.12)')+';color:'+(w.alerts.some(a=>a.severity==='Red')?'var(--red)':'var(--amber)')+'">'+w.alerts.length+' ALERTS</span>'}
+    html+='</div>';
+    if(cur.visibility!=null){
+      html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px">';
+      html+='<div><span style="color:var(--muted)">Vis:</span> <b>'+cur.visibility+' km</b></div>';
+      html+='<div><span style="color:var(--muted)">Temp:</span> <b>'+Math.round(cur.temp||0)+'°C</b></div>';
+      html+='<div><span style="color:var(--muted)">Wind:</span> <b>'+Math.round(cur.wind||0)+' kt</b></div>';
+      html+='<div><span style="color:var(--muted)">Gust:</span> <b>'+Math.round(cur.gust||0)+' kt</b></div>';
+      html+='</div>';
+    }
+    if(hasAlerts){
+      html+='<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">';
+      for(const a of w.alerts.slice(0,3)){
+        const ac=a.severity==='Red'?'var(--red)':a.severity==='Amber'?'var(--amber)':'var(--green)';
+        html+='<div style="font-size:10px;margin-bottom:3px"><span style="color:'+ac+';font-weight:600;text-transform:uppercase">'+a.type.replace(/_/g,' ')+'</span> <span style="color:var(--muted)">'+a.detail+'</span></div>';
+      }
+      if(w.alerts.length>3)html+='<div style="font-size:10px;color:var(--muted)">+'+(w.alerts.length-3)+' more</div>';
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--dim);margin-top:10px;text-align:center">Scanned '+data.airports_scanned+' airports · '+data.red_alerts+' Red alerts · '+new Date(data.scan_time).toLocaleString()+'</div>';
+  c.innerHTML=html;
+}
+
+// ══ NOTAM PARSER ══
+const NOTAM_EXAMPLES={
+  runway:"A1234/26 NOTAMN Q) OMAK/QMRXX/IV/NBO/A/000/999/2536N05531E005\nFROM 120800Z AUG 26 TO 150800Z AUG 26\nRUNWAY 30/12 CLOSED FOR MAINTENANCE. ALL DEPARTURES AND ARRIVALS SUSPENDED DURING CLOSURE WINDOW. COORDINATE WITH ATC FOR REVISED SLOT TIMES.",
+  airspace:"A5678/26 NOTAMN Q) OBBB/QFAXX/IV/NBO/A/000/999/2536N05531E005\nFROM 100600Z AUG 26 TO 140600Z AUG 26\nAIRSPACE OBBB SECTOR B1 CLOSED FOR MILITARY EXERCISE. ALL CIVIL TRAFFIC MUST REROUTE VIA ALTERNATE AIRWAYS. CONTACT DISPATCH FOR REVISED ROUTING.",
+  ils:"A9012/26 NOTAMN Q) OOMS/QFALC/IV/NBO/A/000/999/2336N05829E005\nFROM 150600Z AUG 26 TO 170600Z AUG 26\nILS RUNWAY 26 LOCALIZER UNSERVICEABLE. CAT I OPERATIONS ONLY. ALTERNATE APPROACH: RNP APCH RWY 26. VERIFY AIRCRAFT RNP CAPABILITY BEFORE DISPATCH."
+};
+
+function fillNotamExample(type){document.getElementById('notam-input').value=NOTAM_EXAMPLES[type].replace(/\\n/g,'\n')}
+
+// ══ REAL client-side NOTAM parser — no external API, works entirely offline ══
+// Parses standard ICAO NOTAM format: ID, Q) line (FIR/subject/condition/traffic/purpose/scope/limits/coords+radius),
+// FROM/TO validity, and body text. Classifies risk from keyword patterns in the body.
+const NOTAM_KEYWORDS={
+  Red:[/RWY.*CLOSED|CLOSED.*RWY|RUNWAY.*CLOSED/,/AIRSPACE.*CLOSED|CLOSED.*AIRSPACE/,/MILITARY EXERCISE/,/SUSPENDED/,/PROHIBITED/,/SHOT DOWN|SURFACE-TO-AIR|MISSILE/,/GPS.*JAM|JAMMING|SPOOF/],
+  Amber:[/UNSERVICEABLE|U\/S/,/CAT I ONLY|CAT II|CAT III/,/RESTRICT/,/DEGRADED/,/LIMITED/,/WORK IN PROGRESS|WIP/,/OBSTACLE|CRANE/,/BIRD/]
+};
+function classifyNotamRisk(body){
+  const up=body.toUpperCase();
+  if(NOTAM_KEYWORDS.Red.some(re=>re.test(up)))return'Red';
+  if(NOTAM_KEYWORDS.Amber.some(re=>re.test(up)))return'Amber';
+  return'Green';
+}
+function detectImpactAreas(body){
+  const up=body.toUpperCase();const areas=[];
+  if(/RWY|RUNWAY/.test(up))areas.push('runway_closure');
+  if(/AIRSPACE|SECTOR|FIR/.test(up))areas.push('airspace_closure');
+  if(/ILS|LOCALIZER|VOR|NDB|APCH|APPROACH/.test(up))areas.push('mel_restriction');
+  if(/GPS|GNSS|JAM|SPOOF|RNAV/.test(up))areas.push('gps_interference');
+  if(/SLOT|CURFEW|WATCH HOUR/.test(up))areas.push('airport_slots');
+  if(/FUEL/.test(up))areas.push('fuel_availability');
+  if(!areas.length)areas.push('airspace_closure');
+  return areas;
+}
+function parseNotamMonth(mon){
+  const M={JAN:'01',FEB:'02',MAR:'03',APR:'04',MAY:'05',JUN:'06',JUL:'07',AUG:'08',SEP:'09',OCT:'10',NOV:'11',DEC:'12'};
+  return M[mon.toUpperCase()]||'01';
+}
+function parseNotamZulu(str){
+  // e.g. 120800Z AUG 26  -> DDHHMMZ MON YY
+  const m=str.match(/(\d{2})(\d{2})(\d{2})Z\s+([A-Z]{3})\s+(\d{2})/);
+  if(!m)return null;
+  const[,dd,hh,mi,mon,yy]=m;
+  return `20${yy}-${parseNotamMonth(mon)}-${dd} ${hh}:${mi}Z`;
+}
+function parseNotamText(){
+  const txt=document.getElementById('notam-input').value.trim();
+  if(!txt){alert('Paste NOTAM text first.');return}
+  const c=document.getElementById('notam-result');
+  try{
+    const idMatch=txt.match(/([A-Z]\d{4}\/\d{2})/);
+    const notam_id=idMatch?idMatch[1]:'UNKNOWN';
+    const qMatch=txt.match(/Q\)\s*([A-Z]{4})\//);
+    const location=qMatch?qMatch[1]:(txt.match(/\b[A-Z]{4}\b/)||['UNKNOWN'])[0];
+    const fromToMatch=txt.match(/FROM\s+([\dA-Z\s]+?)\s+TO\s+([\dA-Z\s]+?)(?:\n|$)/i);
+    const effective_from=fromToMatch?parseNotamZulu(fromToMatch[1]):null;
+    const effective_to=fromToMatch?parseNotamZulu(fromToMatch[2]):null;
+    // body = everything after the FROM/TO line, or after the Q) line if no FROM/TO found
+    let body=txt;
+    const bodyIdx=fromToMatch?txt.indexOf(fromToMatch[0])+fromToMatch[0].length:txt.indexOf('\n');
+    if(bodyIdx>0)body=txt.slice(bodyIdx).trim();
+    const risk_level=classifyNotamRisk(body||txt);
+    const impact_areas=detectImpactAreas(body||txt);
+    const priority=risk_level==='Red'?'Critical':risk_level==='Amber'?'High':'Low';
+    const summary=(body||txt).split(/\.\s|\n/)[0].slice(0,90)+((body||txt).length>90?'…':'');
+    const recommended_actions=getActions(impact_areas);
+    renderNotamResult({notam_id,location,effective_from,effective_to,risk_level,priority,impact_areas,summary,recommended_actions});
+  }catch(e){
+    c.innerHTML='<div style="color:var(--red);font-size:13px">Could not parse this NOTAM text — check it follows standard ICAO format (ID, Q) line, FROM/TO, body). Error: '+e.message+'</div>';
+  }
+}
+
+function renderNotamResult(n){
+  const c=document.getElementById('notam-result');
+  const rc=n.risk_level==='Red'?'var(--red)':n.risk_level==='Amber'?'var(--amber)':'var(--green)';
+  let html='<div style="background:var(--panel);border:1px solid '+rc+';border-radius:12px;padding:14px;border-left:3px solid '+rc+'">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">';
+  html+='<div><div style="font-size:14px;font-weight:600">'+n.summary+'</div><div style="font-size:10px;color:var(--muted);margin-top:3px">NOTAM ID: '+n.notam_id+' · Location: '+n.location+'</div></div>';
+  html+='<div style="display:flex;gap:4px">';
+  html+='<span class="pill pill-'+n.risk_level.toLowerCase()+'">'+n.risk_level+'</span>';
+  html+='<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--panel3);color:var(--slate)">'+n.priority+'</span>';
+  html+='</div></div>';
+  if(n.impact_areas&&n.impact_areas.length){
+    html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">';
+    for(const ia of n.impact_areas)html+='<span class="tag tag-impact">'+ia.replace(/_/g,' ')+'</span>';
+    html+='</div>';
+  }
+  if(n.effective_from||n.effective_to){
+    html+='<div style="font-size:11px;color:var(--slate);margin-bottom:10px">';
+    if(n.effective_from)html+='From: <b>'+n.effective_from+'</b> ';
+    if(n.effective_to)html+='To: <b>'+n.effective_to+'</b>';
+    html+='</div>';
+  }
+  if(n.recommended_actions&&n.recommended_actions.length){
+    html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px">Recommended Actions</div>';
+    for(const a of n.recommended_actions)html+='<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:11px;color:var(--slate)"><span style="color:var(--accent);font-weight:700">▸</span>'+a+'</div>';
+    html+='</div>';
+  }
+  html+='<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:6px">';
+  html+='<button class="btn btn-ghost btn-sm" onclick="createPlanFromNotam(\''+n.notam_id+'\',\''+n.type+'\',\''+n.risk_level+'\',\''+n.location+'\')">Create Pre-Ops Plan from This NOTAM</button>';
+  html+='</div>';
+  html+='</div>';
+  c.innerHTML=html;
+}
+
+function createPlanFromNotam(id,type,risk,location){
+  document.getElementById('f-title').value='NOTAM '+id+' — '+type.replace(/_/g,' ')+' at '+location;
+  document.getElementById('f-source').value='NOTAM';
+  document.getElementById('f-routes').value=location;
+  if(risk==='Red')document.getElementById('f-priority').value='Critical';
+  else if(risk==='Amber')document.getElementById('f-priority').value='High';
+  else document.getElementById('f-priority').value='Medium';
+  showView('add-plan');
+  alert('NOTAM details pre-filled in the plan form. Add the effective date and any additional details, then submit.');
+}
+</script>
+</body>
+</html>

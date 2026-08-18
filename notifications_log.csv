@@ -1,0 +1,14 @@
+run_date,notification_date,plan_title,risk,priority,contacts,status
+2026-08-18,2026-08-15,"Yemen airspace closure",Red,Critical,"Sarah Mitchell, James Park, Elena Torres, Omar Farouk",Sent
+2026-08-18,2026-08-15,"Iran FIR military exercise",Amber,High,"Sarah Mitchell, James Park, Omar Farouk",Sent
+2026-08-18,2026-08-15,"MEL restriction A6-EDO",Amber,High,"Raj Singh, James Park, Elena Torres, Aftab Khan",Acknowledged
+2026-08-18,2026-08-15,"A6-EER C-check gap",Amber,High,"Aftab Khan, James Park",Pending
+2026-08-18,2026-08-15,"Dense fog forecast SHJ",Amber,High,"Sarah Mitchell, James Park, Elena Torres",Pending
+2026-08-18,2026-08-15,"Sandstorm warning DXB/SHJ",Amber,Medium,"Sarah Mitchell, James Park",Pending
+2026-08-18,2026-08-15,"KRT fuel unavailability",Amber,High,"Omar Farouk, James Park",Pending
+2026-08-18,2026-08-15,"Crew FTL 900hr limit",Amber,Medium,"Aftab Khan, James Park",Pending
+2026-08-18,2026-08-15,"Sudan FIR permit expiry",Red,Critical,"Sarah Mitchell, James Park, Elena Torres, Omar Farouk",Escalated
+2026-08-18,2026-08-15,"MCT runway maintenance",Amber,Medium,"James Park, Omar Farouk",Acknowledged
+2026-08-18,2026-08-15,"BKK security advisory",Amber,Medium,"Aftab Khan, James Park",Pending
+2026-08-18,2026-08-15,"VVIP movement SHJ",Amber,High,"Sarah Mitchell, James Park, Elena Torres",Actioned
+2026-08-18,2026-08-15,"Hajj extra sections",Amber,High,"Aftab Khan, James Park, Omar Farouk",Pending

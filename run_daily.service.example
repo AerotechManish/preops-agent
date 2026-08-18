@@ -1,0 +1,7 @@
+[Unit]
+Description=Pre-Ops daily plan generation
+
+[Service]
+Type=oneshot
+WorkingDirectory=/absolute/path/to/planning
+ExecStart=/absolute/path/to/planning/run_daily.sh
