@@ -705,7 +705,6 @@ const TODAY=new Date();
 
 // ══ REAL NETWORK EXPOSURE (derived from the uploaded 16 Aug 2026 72-hr schedule: 454 flights / 96 tails / 98 stations) ══
 const NETWORK_STATS={
-  source_note:"Derived from your uploaded 72-hr schedule (originally captured 16 Aug 2026 · 454 flights · 96 tails · 98 stations). Today is 17 Aug — this panel treats that schedule as representative of the rolling Aug 17–19 window; Aug 18-19 figures are same-rotation extrapolations pending your D+1/D+2 schedule files.",
   cells:[
     {n:47,label:"ETOPS-relevant overwater sectors (BKK/KUL/HKT/CGP/DAC/MLE/KTM/CMB)",filter:"etops_alternate"},
     {n:76,label:"Pakistan network sectors (ISB/LHE/KHI/PEW/SKT/UET) — airspace-tension exposed",filter:"congestion"},
@@ -715,10 +714,24 @@ const NETWORK_STATS={
     {n:96,label:"Unique tails in 72-hr plan — any AD grounding removes coverage network-wide",filter:"fleet"}
   ]
 };
+function buildExposureSourceNote(){
+  // Computed live from TODAY and the actual PLANS date range — never hardcode
+  // "today is X" here again, since that goes stale the moment a day passes
+  // and nobody remembers to update a description string by hand.
+  const dates = PLANS.map(p=>p.effective_date).filter(Boolean).sort();
+  const windowStart = dates[0], windowEnd = dates[dates.length-1];
+  const todayStr = TODAY.toISOString().slice(0,10);
+  const capturedStr = "16 Aug 2026";
+  const daysSinceCapture = Math.round((TODAY - new Date('2026-08-16T00:00:00Z'))/86400000);
+  const extrapolated = daysSinceCapture>0
+    ? ` The schedule was captured ${daysSinceCapture} day${daysSinceCapture===1?'':'s'} ago — figures beyond the capture date are same-rotation extrapolations pending your actual D+1/D+2 schedule files, not fresh source data.`
+    : '';
+  return `Derived from your uploaded 72-hr schedule (originally captured ${capturedStr} · 454 flights · 96 tails · 98 stations). Today is ${todayStr} — this panel treats that schedule as representative of the rolling ${windowStart} to ${windowEnd} window.${extrapolated}`;
+}
 function buildExposurePanel(){
   document.getElementById('exposure-panel').innerHTML=`
     <div class="exposure-hdr">
-      <div><div class="exposure-title">📊 72-Hour Network Exposure — from your schedule upload</div><div class="exposure-sub">${NETWORK_STATS.source_note}</div></div>
+      <div><div class="exposure-title">📊 72-Hour Network Exposure — from your schedule upload</div><div class="exposure-sub">${buildExposureSourceNote()}</div></div>
     </div>
     <div class="exposure-grid">
       ${NETWORK_STATS.cells.map(c=>`<div class="exposure-cell" onclick="filterAlerts('${c.filter}')"><div class="exposure-num">${c.n}</div><div class="exposure-lbl">${c.label}</div></div>`).join('')}
