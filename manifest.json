@@ -15,7 +15,295 @@
         "Acknowledged": 10
       },
       "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-19T10:42:06.026Z",
+      "date": "2026-08-19",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-19/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-20T06:22:47.021Z",
+      "date": "2026-08-20",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-20/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-21T06:23:04.548Z",
+      "date": "2026-08-21",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-21/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-22T06:18:14.311Z",
+      "date": "2026-08-22",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-22/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-23T06:20:10.869Z",
+      "date": "2026-08-23",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-23/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-24T06:32:18.765Z",
+      "date": "2026-08-24",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-24/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-25T06:23:33.166Z",
+      "date": "2026-08-25",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-25/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-26T06:25:42.640Z",
+      "date": "2026-08-26",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-26/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-27T16:57:31.177Z",
+      "date": "2026-08-27",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-27/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-28T17:47:30.256Z",
+      "date": "2026-08-28",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-28/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-29T11:51:55.220Z",
+      "date": "2026-08-29",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-29/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-30T10:49:10.771Z",
+      "date": "2026-08-30",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-30/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-08-31T11:58:42.432Z",
+      "date": "2026-08-31",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-08-31/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-09-01T10:37:55.415Z",
+      "date": "2026-09-01",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-09-01/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-09-02T10:03:41.717Z",
+      "date": "2026-09-02",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-09-02/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-09-03T10:14:00.864Z",
+      "date": "2026-09-03",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-09-03/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-09-04T10:03:45.295Z",
+      "date": "2026-09-04",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-09-04/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-09-05T09:33:10.414Z",
+      "date": "2026-09-05",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-09-05/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
     }
   ],
-  "last_run_date": "2026-08-18"
+  "last_run_date": "2026-09-05"
 }

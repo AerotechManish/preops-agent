@@ -29,24 +29,23 @@ jobs:
           node-version: '20'
 
       - name: Run daily generator
-        working-directory: planning
         run: node generate_daily_plan.js
 
       - name: Commit refreshed data + manifest back to the repo
         run: |
           git config user.name "preops-agent-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add planning/data planning/manifest.json planning/notifications_log.csv planning/latest.html planning/day_*
+          git add data manifest.json notifications_log.csv latest.html day_*
           git diff --staged --quiet || git commit -m "Daily refresh: $(date -u +%Y-%m-%d)"
           git push
 
       - name: Prepare Pages artifact
         run: |
           mkdir -p _site/data
-          cp planning/latest.html _site/index.html
-          cp planning/data/plans.json _site/data/plans.json
-          cp planning/data/notifications.json _site/data/notifications.json
-          cp planning/data/meta.json _site/data/meta.json
+          cp latest.html _site/index.html
+          cp data/plans.json _site/data/plans.json
+          cp data/notifications.json _site/data/notifications.json
+          cp data/meta.json _site/data/meta.json
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
