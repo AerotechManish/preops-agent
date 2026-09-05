@@ -36,7 +36,13 @@ jobs:
           git config user.name "preops-agent-bot"
           git config user.email "actions@users.noreply.github.com"
           git add data manifest.json notifications_log.csv latest.html day_*
-          git diff --staged --quiet || git commit -m "Daily refresh: $(date -u +%Y-%m-%d)"
+          git diff --staged --quiet && echo "Nothing new to commit." && exit 0
+          git commit -m "Daily refresh: $(date -u +%Y-%m-%d)"
+          # Guard against exactly the collision we hit on 2026-09-05: two runs
+          # (e.g. a scheduled run and a manual re-run) racing to push the same
+          # day's commit. Pull-rebase onto whatever landed first, then push —
+          # this makes overlapping runs merge cleanly instead of one failing.
+          git pull --rebase origin main
           git push
 
       - name: Prepare Pages artifact
