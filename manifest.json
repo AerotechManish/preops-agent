@@ -1615,7 +1615,23 @@
         "Acknowledged": 10
       },
       "total_notifications_on_file": 13
+    },
+    {
+      "run_at": "2026-11-24T16:36:32.411Z",
+      "date": "2026-11-24",
+      "rolled_window_forward": true,
+      "output_file": "day_2026-11-24/preops_agent.html",
+      "latest_file": "latest.html",
+      "active_cases": 31,
+      "red_cases": 6,
+      "case_stage_breakdown": {
+        "Resolved": 4,
+        "New": 10,
+        "InProgress": 7,
+        "Acknowledged": 10
+      },
+      "total_notifications_on_file": 13
     }
   ],
-  "last_run_date": "2026-11-23"
+  "last_run_date": "2026-11-24"
 }
